@@ -41,47 +41,52 @@ def print_html():
     Y = []
     
     for row in range(len(allFields)):
-        
-        X.append(allFields[row][0])
-        Y.append(allFields[row][1])
+    
+        X.append(allFields[row][0]*50)
+        Y.append(allFields[row][1]*50)
     
         maximum = []
         if max(X[::]) >= max(Y[::]):
             maximum = max(X)
-            maxExt = [i * 50 for i in X]
         else:
             maximum = max(Y)
-            maxExt = [i * 50 for i in Y]
-            
-        #    CM in Pixel converting ?
-        pixExt = str(maximum * 50)
-        print('''<svg width='''+pixExt+''' height='''+pixExt+'''>\n''')
     
     
-    # Grid Computing - Necessary to have the Coordinates as Integers
-#    Values need to be converted to pixels
+            #    CM in Pixel converting ?
+    pixExt = str(maximum)
+    print('''<svg width='''+pixExt+''' height='''+pixExt+'''>\n''')
     
-    i = min(maxExt)
+
+#    Grid Computing - Necessary to have the Coordinates as Integers
+#    Static values so far, not fitted to screen size
+
+    i = 1
     while True:
-
-        ticks = str(i/maxExt[])
-        print('''<line x1="0" y1="0" x2='''+ticks+'''y2='''+ticks+'''style="stroke:rgb(255,0,0);stroke-width:2" /> ''')
+    
+        ticks = str(int((i/len(allFields))*maximum))
+        print('''<line x1='''+ticks+''' y1="0" x2='''+ticks+''' y2='''+str(maximum)+''' style="stroke:rgb(0,0,0);stroke-width:2" /> ''')
+        print('''<line x1="0" y1='''+ticks+''' x2='''+str(maximum)+''' y2='''+ticks+''' style="stroke:rgb(0,0,0);stroke-width:2" /> ''')
         i = i + 1
-        if i == maximum:
-            ticks = str(i/maxExt)
-            print('''<line x1="0" y1="0" x2='''+ticks+'''y2='''+ticks+'''style="stroke:rgb(255,0,0);stroke-width:2" /> ''')
+        if i == len(allFields):
+            ticks = str(int((i/len(allFields))*maximum))
+            print('''<line x1='''+ticks+''' y1="0" x2='''+ticks+''' y2='''+str(maximum)+''' style="stroke:rgb(0,0,0);stroke-width:4" /> ''')
+            print('''<line x1="0" y1='''+ticks+''' x2='''+str(maximum)+''' y2='''+ticks+''' style="stroke:rgb(0,0,0);stroke-width:4" /> ''')
             break
-        
 
 
-# Rectangle Computing
+
+#   Rectangle Computing
+#   Fitted to Screen Size + Centralized
+#   Fill + transparency + hovering
+#   Labelling + hovering [Owner + Crop + Extent]
+#   OnClick [Popup of finds at coordinates]
     for row in range(len(X)):
         rectX = str(X[row])
         rectY = str(Y[row])
 
         #HTML Body
         print ('''<rect width='''+rectX+''' height='''+rectY+''' \
-style="fill:none;stroke-width:3;stroke:rgb(0,0,0)" />''')
+style="fill:none;stroke-width:3;stroke:rgb(255,0,0)" />''')
 
     #HTML Framkework
     print("</svg>\n</body>\n</html>")
