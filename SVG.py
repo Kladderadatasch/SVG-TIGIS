@@ -32,9 +32,26 @@ def print_html():
     print('''Content-Type: text/html\n\n\
 <!DOCTYPE html>\n\
 <head>\n\
-  <title>SVG Mapping</title>\n\
+<title>SVG Mapping</title>\n\
+<style type="text/css" media="screen">\n
+body { background:#eee; margin:0 }\n
+svg {\n
+display:block; border:1px solid #ccc; position:absolute;\n
+top:5%; left:5%; width:90%; height:90%; background:#fff;\n
+} .face { stroke:#000; stroke-width:20px; stroke-linecap:round }\n</style>\n
 </head>\n<body>''')
 
+#remove .face later
+#    print('''Content-Type: text/html\n\n\
+#<!DOCTYPE html>\n\
+#<head>\n\
+#<title>SVG Mapping</title>\n\
+#<style type="text/css" media="screen">\n
+#html, body { margin:0; padding:0; overflow:hidden }\n
+#svg { position:fixed; top:0; bottom:0; left:0; right:0 }\n
+#</style>\n
+#</head>\n<body>''')
+    
     '''SVG Extent'''
 
     X = []
