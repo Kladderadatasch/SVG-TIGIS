@@ -104,25 +104,25 @@ fill: #'''+str(colorramp[row])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n''')
     
     '''Grid Computing'''
 
-    gridmaximum = 100
-    i = 1
-    while True:
+    maxX = max(XFields,key=lambda item:item[1])[1]
+    maxY = max(YFields,key=lambda item:item[1])[1]
     
-        xticks = str(float((i/len(XFields))*gridmaximum)) 
-        yticks = str(float((i/len(YFields))*gridmaximum))
-        
-        print('''<line x1='''+xticks+'''% y1=0 x2='''+xticks+'''% y2='''+str(gridmaximum)+'''% style="stroke:rgb(0,0,0);stroke-width:2" /> ''')
-        print('''<line x1=0 y1='''+yticks+'''% x2='''+str(gridmaximum)+'''% y2='''+yticks+'''% style="stroke:rgb(0,0,0);stroke-width:2" /> ''')
+    i = 1
+    j = 1
+    
+    while True:
+        xticks = str(float((i/maxX)*100))
+        print('''<line x1='''+xticks+'''% y1=0 x2='''+xticks+'''% y2=100% style="stroke:rgb(0,0,0);stroke-width:2" /> ''')
         i = i + 1
-        if i == len(XFields):
-            xticks = str(float((i/len(XFields))*gridmaximum))
-            yticks = str(float((i/len(YFields))*gridmaximum))
-            print('''<line x1='''+xticks+'''% y1=0 x2='''+xticks+'''% y2='''+str(gridmaximum)+'''% style="stroke:rgb(0,0,0);stroke-width:4" /> ''')
-            print('''<line x1=0 y1='''+yticks+'''% x2='''+str(gridmaximum)+'''% y2='''+yticks+'''% style="stroke:rgb(0,0,0);stroke-width:4" /> ''')
+        if i == maxX:
             break
-
-
-
+    while True:
+        yticks = str(float((j/maxY*100)))                
+        print('''<line x1=0 y1='''+yticks+'''% x2=100% y2='''+yticks+'''% style="stroke:rgb(0,0,0);stroke-width:2" /> ''')             
+        j = j + 1
+        if j == maxY:
+            break
+                
     '''Rectangle Computing'''
     
 #   Fitted to Screen Size + Centralized
@@ -130,11 +130,12 @@ fill: #'''+str(colorramp[row])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n''')
 #   Labelling + hovering [Owner + Crop + Extent]
 #   OnClick [Popup of finds at coordinates]
    
+    
     for row in range(len(XFields)):
-        lowX = str((XFields[row][0]/max(XFields,key=lambda item:item[1])[1])*100)
-        lowY = str((YFields[row][0]/max(YFields,key=lambda item:item[1])[1])*100)
-        highX = str((XFields[row][1]/max(XFields,key=lambda item:item[1])[1])*100)
-        highY = str((YFields[row][1]/max(YFields,key=lambda item:item[1])[1])*100)
+        lowX = str((XFields[row][0]/maxX)*100)
+        lowY = str((YFields[row][0]/maxY)*100)
+        highX = str((XFields[row][1]/maxX)*100)
+        highY = str((YFields[row][1]/maxY)*100)
         
         #HTML Body
         print ('''<rect x='''+lowX+'''% y='''+lowY+'''% width='''+highX+'''% height='''+highY+'''% class="rectangle" \
