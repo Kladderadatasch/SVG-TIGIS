@@ -81,7 +81,7 @@ top:5%; left:5%; width:90%; height:90%; background:#fff;\n
 
     for row in range(len(XFields)):
         print('''#r'''+str(row)+''' {
-fill: #'''+str(colorramp[row])+''';\nstroke-width: 3;\nfill-opacity: 0.5;}\n''')
+fill: #'''+str(colorramp[row])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n''')
            
 
     print('''</style>\n</head>\n<body>''')
@@ -97,24 +97,7 @@ fill: #'''+str(colorramp[row])+''';\nstroke-width: 3;\nfill-opacity: 0.5;}\n''')
 #</style>\n
 #</head>\n<body>''')
 
-    '''Coordinate Transformation'''
-
-    X = []
-    Y = []
-    
-    #    X and Y need to be in the same length - Should implement error case
-    for row in range(len(XFields)):
-    
-        X.append(XFields[row][0])
-        Y.append(YFields[row][1])
-
-    
-    maxcoord = []
-    if max(X[::]) >= max(Y[::]):
-        maxcoord = max(X)
-    else:
-        maxcoord = max(Y)
-
+   
     '''Dynamic SVG Extent'''    
 
     print('''<svg width=100% height=100% >\n''')
@@ -147,12 +130,14 @@ fill: #'''+str(colorramp[row])+''';\nstroke-width: 3;\nfill-opacity: 0.5;}\n''')
 #   Labelling + hovering [Owner + Crop + Extent]
 #   OnClick [Popup of finds at coordinates]
    
-    for row in range(len(X)):
-        rectX = str((X[row]/maxcoord)*100)
-        rectY = str((Y[row]/maxcoord)*100)
+    for row in range(len(XFields)):
+        lowX = str((XFields[row][0]/max(XFields,key=lambda item:item[1])[1])*100)
+        lowY = str((YFields[row][0]/max(YFields,key=lambda item:item[1])[1])*100)
+        highX = str((XFields[row][1]/max(XFields,key=lambda item:item[1])[1])*100)
+        highY = str((YFields[row][1]/max(YFields,key=lambda item:item[1])[1])*100)
         
         #HTML Body
-        print ('''<rect width='''+rectX+'''% height='''+rectY+'''% class="rectangle" \
+        print ('''<rect x='''+lowX+'''% y='''+lowY+'''% width='''+highX+'''% height='''+highY+'''% class="rectangle" \
 id="r'''+str(row)+'''" />''')
        
         
