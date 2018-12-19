@@ -9,18 +9,28 @@ cgitb.enable(format = 'text')
 from jinja2 import Environment, FileSystemLoader
 
 #Getting coordinates from DB
-def coordinatesHtml():
+def coordinatesHtml(x = True, y = False):
     conn = cx_Oracle.connect("student/train@geosgen")
     c = conn.cursor()
-    c.execute("SELECT HIX,HIY FROM GISTEACH.FIELDS")
-    
-    list = []
-    for row in c:
-        list.append(row)
-    
+    if x == True and y == False:
+        c.execute("SELECT LOWX,HIX FROM GISTEACH.FIELDS")
+        list = []
+        for row in c:
+            list.append(row)
+        return list
+    elif x == False and y == True:
+        c.execute("SELECT LOWY,HIY FROM GISTEACH.FIELDS")
+        list = []
+        for row in c:
+            list.append(row)
+        return list
+    else:
+        print('''Please select either x or y to be True and the counterpart \
+to be False. Both x = True, y = True or x = False, y = False are not valid.''')
+        
     
     conn.close()
-    return list
+
 
 #Render the template
 #Create Framework
@@ -28,7 +38,8 @@ def coordinatesHtml():
 def print_html():
     env = Environment(loader = FileSystemLoader('.'))
     temp = env.get_template('SVG.html')
-    allFields = coordinatesHtml()
+    XFields = coordinatesHtml(x = True, y = False)
+    YFields = coordinatesHtml(x = False, y = True)
 
     #HTML Framkework
     print('''Content-Type: text/html\n\n\
@@ -68,7 +79,7 @@ top:5%; left:5%; width:90%; height:90%; background:#fff;\n
                  "4682B4","D2B48C",8080,"D8BFD8","FF6347","40E0D0","EE82EE",
                  "F5DEB3","FFFFFF","F5F5F5","FFFF00","9ACD32"]
 
-    for row in range(len(allFields)):
+    for row in range(len(XFields)):
         print('''#r'''+str(row)+''' {
 fill: #'''+str(colorramp[row])+''';\nstroke-width: 3;\nfill-opacity: 0.5;}\n''')
            
@@ -91,11 +102,12 @@ fill: #'''+str(colorramp[row])+''';\nstroke-width: 3;\nfill-opacity: 0.5;}\n''')
     X = []
     Y = []
     
-    for row in range(len(allFields)):
+    #    X and Y need to be in the same length - Should implement error case
+    for row in range(len(XFields)):
     
-        X.append(allFields[row][0])
-        Y.append(allFields[row][1])
-    
+        X.append(XFields[row][0])
+        Y.append(YFields[row][1])
+
     
     maxcoord = []
     if max(X[::]) >= max(Y[::]):
@@ -113,16 +125,17 @@ fill: #'''+str(colorramp[row])+''';\nstroke-width: 3;\nfill-opacity: 0.5;}\n''')
     i = 1
     while True:
     
-#        ticks = str(int((i/len(allFields))*maximum))
-        ticks = str(float((i/len(allFields))*gridmaximum)) 
+        xticks = str(float((i/len(XFields))*gridmaximum)) 
+        yticks = str(float((i/len(YFields))*gridmaximum))
         
-        print('''<line x1='''+ticks+'''% y1=0 x2='''+ticks+'''% y2='''+str(gridmaximum)+'''% style="stroke:rgb(0,0,0);stroke-width:2" /> ''')
-        print('''<line x1=0 y1='''+ticks+'''% x2='''+str(gridmaximum)+'''% y2='''+ticks+'''% style="stroke:rgb(0,0,0);stroke-width:2" /> ''')
+        print('''<line x1='''+xticks+'''% y1=0 x2='''+xticks+'''% y2='''+str(gridmaximum)+'''% style="stroke:rgb(0,0,0);stroke-width:2" /> ''')
+        print('''<line x1=0 y1='''+yticks+'''% x2='''+str(gridmaximum)+'''% y2='''+yticks+'''% style="stroke:rgb(0,0,0);stroke-width:2" /> ''')
         i = i + 1
-        if i == len(allFields):
-            ticks = str(int((i/len(allFields))*gridmaximum))
-            print('''<line x1='''+ticks+'''% y1=0 x2='''+ticks+'''% y2='''+str(gridmaximum)+'''% style="stroke:rgb(0,0,0);stroke-width:4" /> ''')
-            print('''<line x1=0 y1='''+ticks+'''% x2='''+str(gridmaximum)+'''% y2='''+ticks+'''% style="stroke:rgb(0,0,0);stroke-width:4" /> ''')
+        if i == len(XFields):
+            xticks = str(float((i/len(XFields))*gridmaximum))
+            yticks = str(float((i/len(YFields))*gridmaximum))
+            print('''<line x1='''+xticks+'''% y1=0 x2='''+xticks+'''% y2='''+str(gridmaximum)+'''% style="stroke:rgb(0,0,0);stroke-width:4" /> ''')
+            print('''<line x1=0 y1='''+yticks+'''% x2='''+str(gridmaximum)+'''% y2='''+yticks+'''% style="stroke:rgb(0,0,0);stroke-width:4" /> ''')
             break
 
 
