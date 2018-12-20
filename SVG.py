@@ -49,9 +49,9 @@ def print_html():
 <style type="text/css" media="screen">\n
 body { background:#eee; margin:0 }\n
 svg {\n
-display:block; border:1px solid #ccc; position:absolute;\n
-top:5%; left:5%; width:90%; height:90%; background:#fff;\n
-} .face { stroke:#000; stroke-width:20px; stroke-linecap:round }\n''')
+display:block; border:1px solid #ccc; position:relative;\n
+top:5%; left:5%; width:90%; height:90%; background:#fff;\n}\n
+.line {stroke:rgb(0,0,0); stroke-width: 0.2px;}''')
     
     '''Dynamic InLine CSS'''
 #   Add CSS above
@@ -81,7 +81,7 @@ top:5%; left:5%; width:90%; height:90%; background:#fff;\n
 
     for row in range(len(XFields)):
         print('''#r'''+str(row)+''' {
-fill: #'''+str(colorramp[row])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n''')
+fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n''')
            
 
     print('''</style>\n</head>\n<body>''')
@@ -100,25 +100,25 @@ fill: #'''+str(colorramp[row])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n''')
    
     '''Dynamic SVG Extent'''    
 
-    print('''<svg width=100% height=100% >\n''')
+    print('''<svg width=100% height=100% viewBox="0 0 100 100" >\n''')
     
     '''Grid Computing'''
 
     maxX = max(XFields,key=lambda item:item[1])[1]
     maxY = max(YFields,key=lambda item:item[1])[1]
-    
+
     i = 1
     j = 1
     
     while True:
         xticks = str(float((i/maxX)*100))
-        print('''<line x1='''+xticks+'''% y1=0 x2='''+xticks+'''% y2=100% style="stroke:rgb(0,0,0);stroke-width:2" /> ''')
+        print('''<line x1='''+xticks+'''% y1=0 x2='''+xticks+'''% y2=100% class = "line" /> ''')
         i = i + 1
         if i == maxX:
             break
     while True:
         yticks = str(float((j/maxY*100)))                
-        print('''<line x1=0 y1='''+yticks+'''% x2=100% y2='''+yticks+'''% style="stroke:rgb(0,0,0);stroke-width:2" /> ''')             
+        print('''<line x1=0 y1='''+yticks+'''% x2=100% y2='''+yticks+'''% class = "line"/> ''')             
         j = j + 1
         if j == maxY:
             break
@@ -129,17 +129,16 @@ fill: #'''+str(colorramp[row])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n''')
 #   Fill + transparency + hovering
 #   Labelling + hovering [Owner + Crop + Extent]
 #   OnClick [Popup of finds at coordinates]
-   
-    
+  
     for row in range(len(XFields)):
         lowX = str((XFields[row][0]/maxX)*100)
-        lowY = str((YFields[row][0]/maxY)*100)
         highX = str((XFields[row][1]/maxX)*100)
-        highY = str((YFields[row][1]/maxY)*100)
         
-        #HTML Body
-        print ('''<rect x='''+lowX+'''% y='''+lowY+'''% width='''+highX+'''% height='''+highY+'''% class="rectangle" \
-id="r'''+str(row)+'''" />''')
+        lowY = str((YFields[row][0]/maxY)*100)
+        highY = str((YFields[row][1]/maxY)*100)
+            
+        print ('''<polygon points="'''+lowX+''' '''+lowY+''', '''+highX+''' '''+lowY+''', \
+'''+highX+''' '''+highY+''', '''+lowX+''' '''+highY+'''" class="rectangle" id="r'''+str(row)+'''" />''')
        
         
     #HTML Framkework
