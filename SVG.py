@@ -9,26 +9,35 @@ cgitb.enable(format = 'text')
 from jinja2 import Environment, FileSystemLoader
 
 #Getting coordinates from DB
-def coordinatesHtml(x = True, y = False):
+def coordinatesHtml(coord = "Fields",x = True, y = False):
     conn = cx_Oracle.connect("student/train@geosgen")
     c = conn.cursor()
-    if x == True and y == False:
-        c.execute("SELECT LOWX,HIX FROM GISTEACH.FIELDS")
+    if coord == "Fields":
+        if x == True and y == False:
+            c.execute("SELECT LOWX,HIX FROM GISTEACH.FIELDS")
+            list = []
+            for row in c:
+                list.append(row)
+            return list
+        elif x == False and y == True:
+            c.execute("SELECT LOWY,HIY FROM GISTEACH.FIELDS")
+            list = []
+            for row in c:
+                list.append(row)
+            return list
+        else:
+            print('''Please select either x or y to be True and the counterpart \
+    to be False. Both x = True, y = True or x = False, y = False are not valid.''')
+    elif coord == "Points":
+        c.execute("SELECT XCOORD,YCOORD FROM GISTEACH.FINDS")
         list = []
         for row in c:
             list.append(row)
         return list
-    elif x == False and y == True:
-        c.execute("SELECT LOWY,HIY FROM GISTEACH.FIELDS")
-        list = []
-        for row in c:
-            list.append(row)
-        return list
-    else:
-        print('''Please select either x or y to be True and the counterpart \
-to be False. Both x = True, y = True or x = False, y = False are not valid.''')
-        
     
+    else:
+        print('''"Please select coord = "Fields" or coord = "Points"''')
+        
     conn.close()
 
 
@@ -40,6 +49,7 @@ def print_html():
     temp = env.get_template('SVG.html')
     XFields = coordinatesHtml(x = True, y = False)
     YFields = coordinatesHtml(x = False, y = True)
+    Points = coordinatesHtml(coord = "Points")
 
     #HTML Framkework
     print('''Content-Type: text/html\n\n\
@@ -139,6 +149,12 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
             
         print ('''<polygon points="'''+lowX+''' '''+lowY+''', '''+highX+''' '''+lowY+''', \
 '''+highX+''' '''+highY+''', '''+lowX+''' '''+highY+'''" class="rectangle" id="r'''+str(row)+'''" />''')
+        
+    for row in range(len(Points)):
+        X = str((Points[row][0]/maxX)*100)
+        Y = str((Points[row][1]/maxX)*100)
+        
+        print ('''<circle cx="'''+X+'''" cy="'''+Y+'''" r="1" fill="blue" />''')
        
         
     #HTML Framkework
