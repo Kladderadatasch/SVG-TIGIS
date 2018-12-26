@@ -56,13 +56,10 @@ def print_html():
 <!DOCTYPE html>\n\
 <head>\n\
 <title>SVG Mapping</title>\n\
+<link href="../styling.css" rel="stylesheet" type="text/css" >\n\
 <style type="text/css" media="screen">\n
-body { background:#eee; margin:0 }\n
-svg {\n
-display:block; border:1px solid #ccc; position:relative;\n
-top:5%; left:5%; width:90%; height:90%; background:#fff;\n}\n
-.line {stroke:rgb(0,0,0); stroke-width: 0.2px;}''')
-    
+''')
+
     '''Dynamic InLine CSS'''
 #   Add CSS above
     colorramp = ["F0F8FF","FAEBD7","00FFFF","7FFFD4","F0FFFF","F5F5DC","FFE4C4",
