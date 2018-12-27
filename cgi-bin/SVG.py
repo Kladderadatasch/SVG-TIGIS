@@ -56,13 +56,10 @@ def print_html():
 <!DOCTYPE html>\n\
 <head>\n\
 <title>SVG Mapping</title>\n\
+<link href="../styling.css" rel="stylesheet" type="text/css" >\n\
 <style type="text/css" media="screen">\n
-body { background:#eee; margin:0 }\n
-svg {\n
-display:block; border:1px solid #ccc; position:relative;\n
-top:5%; left:5%; width:90%; height:90%; background:#fff;\n}\n
-.line {stroke:rgb(0,0,0); stroke-width: 0.2px;}''')
-    
+''')
+
     '''Dynamic InLine CSS'''
 #   Add CSS above
     colorramp = ["F0F8FF","FAEBD7","00FFFF","7FFFD4","F0FFFF","F5F5DC","FFE4C4",
@@ -108,34 +105,56 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
 #</head>\n<body>''')
 
    
-    '''Dynamic SVG Extent'''    
-
-    print('''<svg width=100% height=100% viewBox="0 0 100 100" >\n''')
+    '''Dynamic SVG Extent'''  
+ 
+    print('''<svg viewBox="-5 -4 110 110" >\n''')
     
-    '''Grid Computing'''
-
     maxX = max(XFields,key=lambda item:item[1])[1]
     maxY = max(YFields,key=lambda item:item[1])[1]
 
     i = 1
     j = 1
+ 
+    '''Grid Labelling'''
+    '''Static Values for neat positioning'''
+    '''Y Axis Inverted'''
+    while True:
+        xticks = float((i/maxX)*100)
+        print('''<text font-size="2" x="'''+str(xticks -0.5)+'''" y="103">'''+str(i)+'''</text>''')
+        i = i + 1
+        if i == maxX + 1:
+            print('''<text font-size="2" x="'''+str(0)+'''" y="103">'''+str(0)+'''</text>''')
+            break
+    while True:
+        yticks = float((j/maxY)*100)
+        print('''<text font-size="2" x="-3" y="'''+str(yticks +0.5)+'''" >'''+str(-1*(j-maxY))+'''</text>''')
+        j = j + 1
+        if j == maxY + 1:
+            print('''<text font-size="2" x="-3" y="'''+str(0)+'''" >'''+str(maxY)+'''</text>''')
+            break    
+
+    '''Grid Computing'''
+    i = 1
+    j = 1
     
     while True:
         xticks = str(float((i/maxX)*100))
-        print('''<line x1='''+xticks+'''% y1=0 x2='''+xticks+'''% y2=100% class = "line" /> ''')
+        print('''<line x1='''+xticks+''' y1=0 x2='''+xticks+''' y2=100 class = "line" /> ''')
         i = i + 1
         if i == maxX:
             break
     while True:
         yticks = str(float((j/maxY*100)))                
-        print('''<line x1=0 y1='''+yticks+'''% x2=100% y2='''+yticks+'''% class = "line"/> ''')             
+        print('''<line x1=0 y1='''+yticks+''' x2=100 y2='''+yticks+''' class = "line"/> ''')             
         j = j + 1
         if j == maxY:
             break
                 
+   
+    
     '''Rectangle Computing'''
     
-#   Fitted to Screen Size + Centralized
+
 #   Fill + transparency + hovering
 #   Labelling + hovering [Owner + Crop + Extent]
 #   OnClick [Popup of finds at coordinates]
@@ -156,9 +175,9 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
         
         print ('''<circle cx="'''+X+'''" cy="'''+Y+'''" r="1" fill="blue" />''')
        
-        
-    #HTML Framkework
-    print("</svg>\n</body>\n</html>")
+
+    print("</svg>\n</svg>\n")   
+    print("</body>\n</html>")
 
     print(temp.render())
 
