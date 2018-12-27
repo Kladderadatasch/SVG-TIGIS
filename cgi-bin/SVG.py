@@ -106,37 +106,34 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
 
    
     '''Dynamic SVG Extent'''  
-    '''Grid Labelling'''
-
-    
-    print('''<svg viewBox="0 0 100 100"> ''')
  
+    print('''<svg viewBox="-5 -4 110 110" >\n''')
+    
     maxX = max(XFields,key=lambda item:item[1])[1]
     maxY = max(YFields,key=lambda item:item[1])[1]
 
     i = 1
     j = 1
  
+    '''Grid Labelling'''
+    '''Static Values for neat positioning'''
+    '''Y Axis Inverted'''
     while True:
         xticks = float((i/maxX)*100)
-        print('''<text font-size="2" x="'''+str(xticks)+'''" y="100">'''+str(i)+'''</text>''')
+        print('''<text font-size="2" x="'''+str(xticks -0.5)+'''" y="103">'''+str(i)+'''</text>''')
         i = i + 1
-        if i == maxY:
+        if i == maxX + 1:
+            print('''<text font-size="2" x="'''+str(0)+'''" y="103">'''+str(0)+'''</text>''')
             break
     while True:
-        yticks = str(float((j/maxY)*100)) 
-        print('''<text font-size="2" x="0" y="'''+yticks+'''" >'''+str(j)+'''</text>''')
+        yticks = float((j/maxY)*100)
+        print('''<text font-size="2" x="-3" y="'''+str(yticks +0.5)+'''" >'''+str(-1*(j-maxY))+'''</text>''')
         j = j + 1
-        if j == maxY:
-            break
-   
-    
+        if j == maxY + 1:
+            print('''<text font-size="2" x="-3" y="'''+str(0)+'''" >'''+str(maxY)+'''</text>''')
+            break    
+
     '''Grid Computing'''
-    print('''<svg viewBox="-5 -4 110 110" >\n''')
-    
-    
-
-
     i = 1
     j = 1
     
