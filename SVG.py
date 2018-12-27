@@ -105,34 +105,59 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
 #</head>\n<body>''')
 
    
-    '''Dynamic SVG Extent'''    
+    '''Dynamic SVG Extent'''  
+    '''Grid Labelling'''
 
-    print('''<svg width=100% height=100% viewBox="0 0 100 100" >\n''')
     
-    '''Grid Computing'''
-
+    print('''<svg viewBox="0 0 100 100"> ''')
+ 
     maxX = max(XFields,key=lambda item:item[1])[1]
     maxY = max(YFields,key=lambda item:item[1])[1]
+
+    i = 1
+    j = 1
+ 
+    while True:
+        xticks = float((i/maxX)*100)
+        print('''<text font-size="2" x="'''+str(xticks)+'''" y="100">'''+str(i)+'''</text>''')
+        i = i + 1
+        if i == maxY:
+            break
+    while True:
+        yticks = str(float((j/maxY)*100)) 
+        print('''<text font-size="2" x="0" y="'''+yticks+'''" >'''+str(j)+'''</text>''')
+        j = j + 1
+        if j == maxY:
+            break
+   
+    
+    '''Grid Computing'''
+    print('''<svg viewBox="-5 -4 110 110" >\n''')
+    
+    
+
 
     i = 1
     j = 1
     
     while True:
         xticks = str(float((i/maxX)*100))
-        print('''<line x1='''+xticks+'''% y1=0 x2='''+xticks+'''% y2=100% class = "line" /> ''')
+        print('''<line x1='''+xticks+''' y1=0 x2='''+xticks+''' y2=100 class = "line" /> ''')
         i = i + 1
         if i == maxX:
             break
     while True:
         yticks = str(float((j/maxY*100)))                
-        print('''<line x1=0 y1='''+yticks+'''% x2=100% y2='''+yticks+'''% class = "line"/> ''')             
+        print('''<line x1=0 y1='''+yticks+''' x2=100 y2='''+yticks+''' class = "line"/> ''')             
         j = j + 1
         if j == maxY:
             break
                 
+   
+    
     '''Rectangle Computing'''
     
-#   Fitted to Screen Size + Centralized
+
 #   Fill + transparency + hovering
 #   Labelling + hovering [Owner + Crop + Extent]
 #   OnClick [Popup of finds at coordinates]
@@ -153,9 +178,9 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
         
         print ('''<circle cx="'''+X+'''" cy="'''+Y+'''" r="1" fill="blue" />''')
        
-        
-    #HTML Framkework
-    print("</svg>\n</body>\n</html>")
+
+    print("</svg>\n</svg>\n")   
+    print("</body>\n</html>")
 
     print(temp.render())
 
