@@ -34,10 +34,10 @@ def coordinatesHtml(coord = "Fields",x = True, y = False):
         for row in c:
             list.append(row)
         return list
-    
+
     else:
         print('''"Please select coord = "Fields" or coord = "Points"''')
-        
+
     conn.close()
 
 
@@ -88,8 +88,8 @@ def print_html():
 
     for row in range(len(XFields)):
         print('''#r'''+str(row)+''' {
-fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n''')
-           
+fill: #'''+str(colorramp[row+10])+''';}\n''')
+
 
     print('''</style>\n</head>\n<body>''')
 
@@ -104,17 +104,17 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
 #</style>\n
 #</head>\n<body>''')
 
-   
-    '''Dynamic SVG Extent'''  
- 
+
+    '''Dynamic SVG Extent'''
+
     print('''<svg viewBox="-5 -4 110 110" >\n''')
-    
+
     maxX = max(XFields,key=lambda item:item[1])[1]
     maxY = max(YFields,key=lambda item:item[1])[1]
 
     i = 1
     j = 1
- 
+
     '''Grid Labelling'''
     '''Static Values for neat positioning'''
     '''Y Axis Inverted'''
@@ -131,12 +131,12 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
         j = j + 1
         if j == maxY + 1:
             print('''<text font-size="2" x="-3" y="'''+str(0)+'''" >'''+str(maxY)+'''</text>''')
-            break    
+            break
 
     '''Grid Computing'''
     i = 1
     j = 1
-    
+
     while True:
         xticks = str(float((i/maxX)*100))
         print('''<line x1='''+xticks+''' y1=0 x2='''+xticks+''' y2=100 class = "line" /> ''')
@@ -144,39 +144,39 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
         if i == maxX:
             break
     while True:
-        yticks = str(float((j/maxY*100)))                
-        print('''<line x1=0 y1='''+yticks+''' x2=100 y2='''+yticks+''' class = "line"/> ''')             
+        yticks = str(float((j/maxY*100)))
+        print('''<line x1=0 y1='''+yticks+''' x2=100 y2='''+yticks+''' class = "line"/> ''')
         j = j + 1
         if j == maxY:
             break
-                
-   
-    
+
+
+
     '''Rectangle Computing'''
-    
+
 
 #   Fill + transparency + hovering
 #   Labelling + hovering [Owner + Crop + Extent]
 #   OnClick [Popup of finds at coordinates]
-  
+
     for row in range(len(XFields)):
         lowX = str((XFields[row][0]/maxX)*100)
         highX = str((XFields[row][1]/maxX)*100)
-        
+
         lowY = str((YFields[row][0]/maxY)*100)
         highY = str((YFields[row][1]/maxY)*100)
-            
+
         print ('''<polygon points="'''+lowX+''' '''+lowY+''', '''+highX+''' '''+lowY+''', \
-'''+highX+''' '''+highY+''', '''+lowX+''' '''+highY+'''" class="rectangle" id="r'''+str(row)+'''" />''')
-        
+'''+highX+''' '''+highY+''', '''+lowX+''' '''+highY+'''" class="fields" id="r'''+str(row)+'''" />''')
+
     for row in range(len(Points)):
         X = str((Points[row][0]/maxX)*100)
         Y = str((Points[row][1]/maxX)*100)
-        
-        print ('''<circle cx="'''+X+'''" cy="'''+Y+'''" r="1" fill="blue" />''')
-       
 
-    print("</svg>\n</svg>\n")   
+        print ('''<circle cx="'''+X+'''" cy="'''+Y+'''" r="1" fill="blue" />''')
+
+
+    print("</svg>\n</svg>\n")
     print("</body>\n</html>")
 
     print(temp.render())
