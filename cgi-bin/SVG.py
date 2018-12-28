@@ -40,16 +40,19 @@ def coordinatesHtml(coord = "Fields",x = True, y = False):
 
     conn.close()
 
+    '''Template Creation'''
+    '''Setting Environment'''
 
-#Render the template
-#Create Framework
-    #Encapsulate CSS in external files
 def print_html():
-    env = Environment(loader = FileSystemLoader('.'))
+    env = Environment(loader = FileSystemLoader('../'))
     temp = env.get_template('SVG.html')
     XFields = coordinatesHtml(x = True, y = False)
     YFields = coordinatesHtml(x = False, y = True)
     Points = coordinatesHtml(coord = "Points")
+
+    '''Creating Header'''
+    '''../ seems to be necessary, even .html and .css are in same folder'''
+    '''rendering seems to look out in the .py dir'''
 
     #HTML Framkework
     print('''Content-Type: text/html\n\n\
@@ -57,6 +60,8 @@ def print_html():
 <head>\n\
 <title>SVG Mapping</title>\n\
 <link href="../styling.css" rel="stylesheet" type="text/css" >\n\
+<link href="../popups.css" rel="stylesheet" type="text/css" >\n\
+<script src="../popups.js"></script>\n\
 <style type="text/css" media="screen">\n
 ''')
 
