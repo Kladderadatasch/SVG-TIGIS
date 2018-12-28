@@ -61,7 +61,6 @@ def print_html():
 <title>SVG Mapping</title>\n\
 <link href="../styling.css" rel="stylesheet" type="text/css" >\n\
 <link href="../popups.css" rel="stylesheet" type="text/css" >\n\
-<script src="../popups.js"></script>\n\
 <style type="text/css" media="screen">\n
 ''')
 
@@ -96,7 +95,8 @@ def print_html():
 fill: #'''+str(colorramp[row+10])+''';}\n''')
 
 
-    print('''</style>\n</head>\n<body>''')
+    print('''</style>\n''')
+    print('''</head>\n<body>''')
 
     #remove .face later
 #    print('''Content-Type: text/html\n\n\
@@ -171,8 +171,11 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
         lowY = str((YFields[row][0]/maxY)*100)
         highY = str((YFields[row][1]/maxY)*100)
 
-        print ('''<polygon points="'''+lowX+''' '''+lowY+''', '''+highX+''' '''+lowY+''', \
-'''+highX+''' '''+highY+''', '''+lowX+''' '''+highY+'''" class="fields" id="r'''+str(row)+'''" />''')
+        print ('''\n<polygon points="'''+lowX+''' '''+lowY+''', '''+highX+''' '''+lowY+''', \
+'''+highX+''' '''+highY+''', '''+lowX+''' '''+highY+'''" class="fields" id="r'''+str(row)+'''" \
+onclick="changeClass()" />''')
+        print('''<text class="hidden" id="textr0" x="'''+lowX+'''" y="'''+lowY+'''" font-size="2">PopUp Test \
+</text>''')
 
     for row in range(len(Points)):
         X = str((Points[row][0]/maxX)*100)
@@ -181,7 +184,9 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
         print ('''<circle cx="'''+X+'''" cy="'''+Y+'''" r="1" fill="blue" />''')
 
 
-    print("</svg>\n</svg>\n")
+    print("</svg>\n")
+    print('''<script>\nfunction changeClass() {\n\
+    document.getElementById("textr0").className = "visible";\n}\n</script>''')
     print("</body>\n</html>")
 
     print(temp.render())
