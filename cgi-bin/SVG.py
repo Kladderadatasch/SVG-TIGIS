@@ -45,23 +45,36 @@ def coordinatesHtml(coord = "Fields",x = True, y = False):
 '''Second DB connection function'''
 '''Joining of data made inside DB'''
 
-def dataHtml(fields = TRUE, finds = FALSE):
+def dataHtml(fields = True, finds = False):
     conn = cx_Oracle.connect("student/train@geosgen")
     c = conn.cursor()
-    if fields == TRUE:
-        c.execute("SELECT FIELD_ID,AREA,OWNER,CROP FROM GISTEACH.FIELDS;")
+    if fields == True:
+        c.execute("SELECT FIELD_ID,AREA,OWNER,CROP FROM GISTEACH.FIELDS")
 #        SELECT * FROM GISTEACH.CROPS;
 #        JOIN SELECTION IN DB
         list = []
+        dict = {'FieldID':[],'Area':[],'Owner':[],'Crop':[]}
         for row in c:
-            list.append[row]
-        return list
-    elif finds == TRUE:
-        c.execute("SELECT FIND_ID, TYPE, DEPTH, FIELD_NOTES FROM GISTEACH.FINDS;")
+            list.append(row)
+        for row in range(len(list)):
+            dict['FieldID'].append(list[row][0])
+            dict['Area'].append(list[row][1])
+            dict['Owner'].append(list[row][2])
+            dict['Crop'].append(list[row][3])
+        return dict
+    elif finds == True:
+        c.execute("SELECT FIND_ID, TYPE, DEPTH, FIELD_NOTES FROM GISTEACH.FINDS")
         list = []
+        dict = {'FindID':[],'Type':[],'Depth':[],'FieldNotes':[]}
         for row in c:
-            list.append[row]
-        return list
+            list.append(row)
+        for row in range(len(list)):
+            dict['FindID'].append(list[row][0])
+            dict['Type'].append(list[row][1])
+            dict['Depth'].append(list[row][2])
+            dict['FieldNotes'].append(list[row][3])
+        return dict
+
     conn.close()
 
 
@@ -74,6 +87,10 @@ def print_html():
     XFields = coordinatesHtml(x = True, y = False)
     YFields = coordinatesHtml(x = False, y = True)
     Points = coordinatesHtml(coord = "Points")
+    fields = dataHtml(fields = True)
+    finds = dataHtml(fields = False, finds = True)
+
+
 
     '''Creating Header'''
     '''../ seems to be necessary, even .html and .css are in same folder'''
@@ -200,8 +217,9 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 '''+highX+''' '''+highY+''', '''+lowX+''' '''+highY+'''" class="fields" id="r'''+str(row)+'''" \
 onclick="changeClassFromIDr'''+str(row)+'''()" />''')
 
-        print('''<text class="hidden" id="textr'''+str(row)+'''" x="'''+lowX+'''" y="'''+lowY+'''" font-size="2">PopUp Test \
-</text>''')
+        print('''<text class="hidden" id="textr'''+str(row)+'''" x="'''+lowX+'''" y="'''+lowY+'''" font-size="2">\
+Field ID:'''+str(fields['FieldID'][row])+'''\nOwner:'''+str(fields['Owner'][row])+'''\nArea:'''+str(fields['Area'][row])+'''\n\
+CropID:'''+str(fields['Crop'][row])+'''\n</text>''')
 
     for row in range(len(Points)):
         X = str((Points[row][0]/maxX)*100)
