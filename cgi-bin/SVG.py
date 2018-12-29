@@ -186,7 +186,7 @@ onclick="changeClass()" />''')
 
     print("</svg>\n")
     print('''<script>\nfunction changeClass() {\n\
-    document.getElementById("textr0").className = "visible";\n}\n</script>''')
+    document.getElementById('textr0').classList.toggle('visible');\n}\n</script>''')
     print("</body>\n</html>")
 
     print(temp.render())
