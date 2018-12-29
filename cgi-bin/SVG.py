@@ -173,8 +173,9 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 
         print ('''\n<polygon points="'''+lowX+''' '''+lowY+''', '''+highX+''' '''+lowY+''', \
 '''+highX+''' '''+highY+''', '''+lowX+''' '''+highY+'''" class="fields" id="r'''+str(row)+'''" \
-onclick="changeClass()" />''')
-        print('''<text class="hidden" id="textr0" x="'''+lowX+'''" y="'''+lowY+'''" font-size="2">PopUp Test \
+onclick="changeClassFromIDr'''+str(row)+'''()" />''')
+
+        print('''<text class="hidden" id="textr'''+str(row)+'''" x="'''+lowX+'''" y="'''+lowY+'''" font-size="2">PopUp Test \
 </text>''')
 
     for row in range(len(Points)):
@@ -185,10 +186,15 @@ onclick="changeClass()" />''')
 
 
     print("</svg>\n")
-    print('''<script>\nfunction changeClass() {\n\
-    document.getElementById('textr0').classList.toggle('visible');\n}\n</script>''')
-    print("</body>\n</html>")
 
+
+    '''JavaScript'''
+
+    for row in range(len(XFields)):
+        print('''<script>\nfunction changeClassFromIDr'''+str(row)+'''() {\n\
+document.getElementById('textr'''+str(row)+'''').classList.toggle('visible');\n}\n</script>''')
+
+    print("</body>\n</html>")
     print(temp.render())
 
 #run
