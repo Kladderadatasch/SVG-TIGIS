@@ -8,7 +8,8 @@ import cgi
 cgitb.enable(format = 'text')
 from jinja2 import Environment, FileSystemLoader
 
-#Getting coordinates from DB
+'''Retrieving coordinates from DB - Essential Data'''
+'''First DB connection function'''
 def coordinatesHtml(coord = "Fields",x = True, y = False):
     conn = cx_Oracle.connect("student/train@geosgen")
     c = conn.cursor()
@@ -40,8 +41,32 @@ def coordinatesHtml(coord = "Fields",x = True, y = False):
 
     conn.close()
 
-    '''Template Creation'''
-    '''Setting Environment'''
+'''Retrieving ownership, crops, area, etc. data from DB - Secondary data'''
+'''Second DB connection function'''
+'''Joining of data made inside DB'''
+
+def dataHtml(fields = TRUE, finds = FALSE):
+    conn = cx_Oracle.connect("student/train@geosgen")
+    c = conn.cursor()
+    if fields == TRUE:
+        c.execute("SELECT FIELD_ID,AREA,OWNER,CROP FROM GISTEACH.FIELDS;")
+#        SELECT * FROM GISTEACH.CROPS;
+#        JOIN SELECTION IN DB
+        list = []
+        for row in c:
+            list.append[row]
+        return list
+    elif finds == TRUE:
+        c.execute("SELECT FIND_ID, TYPE, DEPTH, FIELD_NOTES FROM GISTEACH.FINDS;")
+        list = []
+        for row in c:
+            list.append[row]
+        return list
+    conn.close()
+
+
+'''Template Creation'''
+'''Setting Environment'''
 
 def print_html():
     env = Environment(loader = FileSystemLoader('../'))
