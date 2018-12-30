@@ -49,30 +49,40 @@ def dataHtml(fields = True, finds = False):
     conn = cx_Oracle.connect("student/train@geosgen")
     c = conn.cursor()
     if fields == True:
-        c.execute("SELECT FIELD_ID,AREA,OWNER,CROP FROM GISTEACH.FIELDS")
+        c.execute("SELECT FIELD_ID,LOWX,LOWY,HIX,HIY,AREA,OWNER,NAME,START_OF_SEASON, END_OF_SEASON FROM GISTEACH.FIELDS, GISTEACH.CROPS WHERE GISTEACH.FIELDS.CROP = GISTEACH.CROPS.CROP")
 #        SELECT * FROM GISTEACH.CROPS;
 #        JOIN SELECTION IN DB
         list = []
-        dict = {'FieldID':[],'Area':[],'Owner':[],'Crop':[]}
+        dict = {'FieldID':[],'LowX':[],'LowY':[],'HiX':[],'HiY':[],'Area':[],'Owner':[],'Crop':[],'StartSeason':[],'EndSeason':[]}
         for row in c:
             list.append(row)
         for row in range(len(list)):
             dict['FieldID'].append(list[row][0])
-            dict['Area'].append(list[row][1])
-            dict['Owner'].append(list[row][2])
-            dict['Crop'].append(list[row][3])
+            dict['LowX'].append(list[row][1])
+            dict['LowY'].append(list[row][2])
+            dict['HiX'].append(list[row][3])
+            dict['HiY'].append(list[row][4])
+            dict['Area'].append(list[row][5])
+            dict['Owner'].append(list[row][6])
+            dict['Crop'].append(list[row][7])
+            dict['StartSeason'].append(list[row][8])
+            dict['EndSeason'].append(list[row][9])
         return dict
     elif finds == True:
-        c.execute("SELECT FIND_ID, TYPE, DEPTH, FIELD_NOTES FROM GISTEACH.FINDS")
+        c.execute("SELECT FIND_ID, XCOORD, YCOORD, NAME, PERIOD, USE, DEPTH, FIELD_NOTES FROM GISTEACH.FINDS, GISTEACH.CLASS WHERE GISTEACH.FINDS.TYPE = GISTEACH.CLASS.TYPE")
         list = []
-        dict = {'FindID':[],'Type':[],'Depth':[],'FieldNotes':[]}
+        dict = {'FindID':[],'XCoord':[],'YCoord':[],'Name':[],'Period':[],'Use':[],'Depth':[],'FieldNotes':[]}
         for row in c:
             list.append(row)
         for row in range(len(list)):
             dict['FindID'].append(list[row][0])
-            dict['Type'].append(list[row][1])
-            dict['Depth'].append(list[row][2])
-            dict['FieldNotes'].append(list[row][3])
+            dict['XCoord'].append(list[row][1])
+            dict['YCoord'].append(list[row][2])
+            dict['Name'].append(list[row][3])
+            dict['Period'].append(list[row][4])
+            dict['Use'].append(list[row][5])
+            dict['Depth'].append(list[row][6])
+            dict['FieldNotes'].append(list[row][7])
         return dict
 
     conn.close()
@@ -217,28 +227,47 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
         print ('''\n<polygon points="'''+str(lowX)+''' '''+str(lowY)+''', '''+str(highX)+''' '''+str(lowY)+''', \
 '''+str(highX)+''' '''+str(highY)+''', '''+str(lowX)+''' '''+str(highY)+'''" class="fields" id="r'''+str(row)+'''" \
 onclick="changeClassFromIDr'''+str(row)+'''()" />''')
+
+
+
+#    '''Text Computing'''
         i = 1
-        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY)+'''">\
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+5)+'''">\
 Field ID:'''+str(fields['FieldID'][row])+'''\n</text>''')
         i = i + 1
-        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+5)+'''">\
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+10)+'''">\
 Owner:'''+str(fields['Owner'][row])+'''\n</text>''')
         i = i + 1
-        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+10)+'''">\
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+15)+'''">\
 Area:'''+str(fields['Area'][row])+'''\n</text>''')
         i = i + 1
-        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+15)+'''">\
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+20)+'''">\
 CropID:'''+str(fields['Crop'][row])+'''\n</text>''')
 
+    '''Findings Computing'''
     for row in range(len(Points)):
         X = str((Points[row][0]/maxX)*100)
         Y = str((Points[row][1]/maxX)*100)
 
         print ('''<circle cx="'''+X+'''" cy="'''+Y+'''" r="1" fill="blue" />''')
 
-
+    '''InfoIcon Computing'''
+    print('''<g id="myicon" pointer-events="all" transform="translate(0,0)">\n\
+    <circle cx="22" cy="9" r="3.5" fill="none" stroke="gold" stroke-width="0.5"/>\n\
+    <circle cx="22" cy="7.7" r="0.5" fill="gold"/>\n\
+    <rect x="21.625" y="8.8" width="0.75" height="2.5" fill="gold"/>\n\
+  </g>''')
     print("</svg>\n")
 
+    '''PopUp Text'''
+    print('''<div id="mypopup">\n\
+<h3>Popup title</h3>\n\
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,\
+ sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\
+ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>\n\
+<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\
+ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>\n\
+</div>\n''')
 
     '''JavaScript'''
 
@@ -247,6 +276,23 @@ CropID:'''+str(fields['Crop'][row])+'''\n</text>''')
         for i in range(len(fields)):
             print('''document.getElementById('textr'''+str(row)+'''Nr'''+str(i+1)+'''').classList.toggle('visible');\n''')
         print('''}\n</script>''')
+
+    '''PopUp Script'''
+
+    print('''<script>\nvar myicon = document.getElementById("myicon");\n\
+var mypopup = document.getElementById("mypopup");\n\
+myicon.addEventListener("mouseover", showPopup);\n\
+myicon.addEventListener("mouseout", hidePopup);\n\
+\n\
+function showPopup(evt) {\n\
+var iconPos = myicon.getBoundingClientRect();\n\
+mypopup.style.left = (iconPos.right + 20) + "px";\n\
+mypopup.style.top = (window.scrollY + iconPos.top - 60) + "px";\n\
+mypopup.style.display = "block";\n\
+}\n\
+function hidePopup(evt) {\n\
+  mypopup.style.display = "none";\n\
+}\n</script>''')
 
     print("</body>\n</html>")
     print(temp.render())
