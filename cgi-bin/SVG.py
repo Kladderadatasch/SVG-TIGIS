@@ -231,7 +231,7 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 #   Labelling + hovering [Owner + Crop + Extent]
 #   OnClick [Popup of finds at coordinates]
 
-    for row in range(len(XFields)):
+    for row in range(len(fields['FieldID'])):
    
         lowX = fields['LowX'][row]
         lowY = fields['LowY'][row]
@@ -259,11 +259,11 @@ Area:'''+str(fields['Area'][row])+'''\n</text>''')
 CropID:'''+str(fields['Crop'][row])+'''\n</text>''')
 
     '''Findings Computing'''
-    for row in range(len(Points)):
-        X = str((Points[row][0]/maxX)*100)
-        Y = str((Points[row][1]/maxX)*100)
+    for row in range(len(finds['FindID'])):
+        X = finds['XCoord'][row]
+        Y = finds['YCoord'][row]
 
-        print ('''<circle cx="'''+X+'''" cy="'''+Y+'''" r="1" fill="blue" />''')
+        print ('''<circle cx="'''+str(X)+'''" cy="'''+str(Y)+'''" r="1" fill="blue" />''')
 
     '''InfoIcon Computing'''
     print('''<g id="myicon" pointer-events="all" transform="translate(0,0)">\n\
