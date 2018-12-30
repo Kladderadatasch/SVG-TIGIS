@@ -57,6 +57,7 @@ def dataHtml(fields = True, finds = False):
         for row in c:
             list.append(row)
         for row in range(len(list)):
+#            Append
             dict['FieldID'].append(list[row][0])
             dict['LowX'].append(list[row][1])
             dict['LowY'].append(list[row][2])
@@ -67,6 +68,14 @@ def dataHtml(fields = True, finds = False):
             dict['Crop'].append(list[row][7])
             dict['StartSeason'].append(list[row][8])
             dict['EndSeason'].append(list[row][9])
+#            Update - Relative and Y Inverted Coordinates
+        maxX = max(dict['HiX'])
+        maxY = max(dict['HiY'])
+        for row in range(len(list)):
+            dict['LowX'][row]= ((dict['LowX'][row]/maxX))*100
+            dict['LowY'][row]= (1-(dict['LowY'][row]/maxY))*100
+            dict['HiX'][row]= ((dict['HiX'][row]/maxX))*100
+            dict['HiY'][row]= (1-(dict['HiY'][row]/maxY))*100
         return dict
     elif finds == True:
         c.execute("SELECT FIND_ID, XCOORD, YCOORD, NAME, PERIOD, USE, DEPTH, FIELD_NOTES FROM GISTEACH.FINDS, GISTEACH.CLASS WHERE GISTEACH.FINDS.TYPE = GISTEACH.CLASS.TYPE")
@@ -83,6 +92,12 @@ def dataHtml(fields = True, finds = False):
             dict['Use'].append(list[row][5])
             dict['Depth'].append(list[row][6])
             dict['FieldNotes'].append(list[row][7])
+#            Update - Relative and Y Inverted Coordinates
+        maxX = max(dict['XCoord'])
+        maxY = max(dict['YCoord'])
+        for row in range(len(list)):
+            dict['XCoord'][row] = ((dict['XCoord'][row]/maxX))*100
+            dict['YCoord'][row] = (1-(dict['YCoord'][row]/maxY))*100
         return dict
 
     conn.close()
@@ -217,13 +232,12 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 #   OnClick [Popup of finds at coordinates]
 
     for row in range(len(XFields)):
-
-        lowX = (XFields[row][0]/maxX)*100
-        highX = (XFields[row][1]/maxX)*100
-
-        lowY = (YFields[row][0]/maxY)*100
-        highY = (YFields[row][1]/maxY)*100
-
+   
+        lowX = fields['LowX'][row]
+        lowY = fields['LowY'][row]
+        highX = fields['HiX'][row]
+        highY = fields['HiY'][row]
+        
         print ('''\n<polygon points="'''+str(lowX)+''' '''+str(lowY)+''', '''+str(highX)+''' '''+str(lowY)+''', \
 '''+str(highX)+''' '''+str(highY)+''', '''+str(lowX)+''' '''+str(highY)+'''" class="fields" id="r'''+str(row)+'''" \
 onclick="changeClassFromIDr'''+str(row)+'''()" />''')
