@@ -207,18 +207,27 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 #   OnClick [Popup of finds at coordinates]
 
     for row in range(len(XFields)):
-        lowX = str((XFields[row][0]/maxX)*100)
-        highX = str((XFields[row][1]/maxX)*100)
 
-        lowY = str((YFields[row][0]/maxY)*100)
-        highY = str((YFields[row][1]/maxY)*100)
+        lowX = (XFields[row][0]/maxX)*100
+        highX = (XFields[row][1]/maxX)*100
 
-        print ('''\n<polygon points="'''+lowX+''' '''+lowY+''', '''+highX+''' '''+lowY+''', \
-'''+highX+''' '''+highY+''', '''+lowX+''' '''+highY+'''" class="fields" id="r'''+str(row)+'''" \
+        lowY = (YFields[row][0]/maxY)*100
+        highY = (YFields[row][1]/maxY)*100
+
+        print ('''\n<polygon points="'''+str(lowX)+''' '''+str(lowY)+''', '''+str(highX)+''' '''+str(lowY)+''', \
+'''+str(highX)+''' '''+str(highY)+''', '''+str(lowX)+''' '''+str(highY)+'''" class="fields" id="r'''+str(row)+'''" \
 onclick="changeClassFromIDr'''+str(row)+'''()" />''')
-
-        print('''<text class="hidden" id="textr'''+str(row)+'''" x="'''+lowX+'''" y="'''+lowY+'''" font-size="2">\
-Field ID:'''+str(fields['FieldID'][row])+'''\nOwner:'''+str(fields['Owner'][row])+'''\nArea:'''+str(fields['Area'][row])+'''\n\
+        i = 1
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY)+'''">\
+Field ID:'''+str(fields['FieldID'][row])+'''\n</text>''')
+        i = i + 1
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+5)+'''">\
+Owner:'''+str(fields['Owner'][row])+'''\n</text>''')
+        i = i + 1
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+10)+'''">\
+Area:'''+str(fields['Area'][row])+'''\n</text>''')
+        i = i + 1
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+15)+'''">\
 CropID:'''+str(fields['Crop'][row])+'''\n</text>''')
 
     for row in range(len(Points)):
@@ -234,8 +243,10 @@ CropID:'''+str(fields['Crop'][row])+'''\n</text>''')
     '''JavaScript'''
 
     for row in range(len(XFields)):
-        print('''<script>\nfunction changeClassFromIDr'''+str(row)+'''() {\n\
-document.getElementById('textr'''+str(row)+'''').classList.toggle('visible');\n}\n</script>''')
+        print('''<script>\nfunction changeClassFromIDr'''+str(row)+'''() {\n''')
+        for i in range(len(fields)):
+            print('''document.getElementById('textr'''+str(row)+'''Nr'''+str(i+1)+'''').classList.toggle('visible');\n''')
+        print('''}\n</script>''')
 
     print("</body>\n</html>")
     print(temp.render())
