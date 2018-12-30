@@ -8,7 +8,8 @@ import cgi
 cgitb.enable(format = 'text')
 from jinja2 import Environment, FileSystemLoader
 
-#Getting coordinates from DB
+'''Retrieving coordinates from DB - Essential Data'''
+'''First DB connection function'''
 def coordinatesHtml(coord = "Fields",x = True, y = False):
     conn = cx_Oracle.connect("student/train@geosgen")
     c = conn.cursor()
@@ -34,22 +35,66 @@ def coordinatesHtml(coord = "Fields",x = True, y = False):
         for row in c:
             list.append(row)
         return list
-    
+
     else:
         print('''"Please select coord = "Fields" or coord = "Points"''')
-        
+
+    conn.close()
+
+'''Retrieving ownership, crops, area, etc. data from DB - Secondary data'''
+'''Second DB connection function'''
+'''Joining of data made inside DB'''
+
+def dataHtml(fields = True, finds = False):
+    conn = cx_Oracle.connect("student/train@geosgen")
+    c = conn.cursor()
+    if fields == True:
+        c.execute("SELECT FIELD_ID,AREA,OWNER,CROP FROM GISTEACH.FIELDS")
+#        SELECT * FROM GISTEACH.CROPS;
+#        JOIN SELECTION IN DB
+        list = []
+        dict = {'FieldID':[],'Area':[],'Owner':[],'Crop':[]}
+        for row in c:
+            list.append(row)
+        for row in range(len(list)):
+            dict['FieldID'].append(list[row][0])
+            dict['Area'].append(list[row][1])
+            dict['Owner'].append(list[row][2])
+            dict['Crop'].append(list[row][3])
+        return dict
+    elif finds == True:
+        c.execute("SELECT FIND_ID, TYPE, DEPTH, FIELD_NOTES FROM GISTEACH.FINDS")
+        list = []
+        dict = {'FindID':[],'Type':[],'Depth':[],'FieldNotes':[]}
+        for row in c:
+            list.append(row)
+        for row in range(len(list)):
+            dict['FindID'].append(list[row][0])
+            dict['Type'].append(list[row][1])
+            dict['Depth'].append(list[row][2])
+            dict['FieldNotes'].append(list[row][3])
+        return dict
+
     conn.close()
 
 
-#Render the template
-#Create Framework
-    #Encapsulate CSS in external files
+'''Template Creation'''
+'''Setting Environment'''
+
 def print_html():
-    env = Environment(loader = FileSystemLoader('.'))
+    env = Environment(loader = FileSystemLoader('../'))
     temp = env.get_template('SVG.html')
     XFields = coordinatesHtml(x = True, y = False)
     YFields = coordinatesHtml(x = False, y = True)
     Points = coordinatesHtml(coord = "Points")
+    fields = dataHtml(fields = True)
+    finds = dataHtml(fields = False, finds = True)
+
+
+
+    '''Creating Header'''
+    '''../ seems to be necessary, even .html and .css are in same folder'''
+    '''rendering seems to look out in the .py dir'''
 
     #HTML Framkework
     print('''Content-Type: text/html\n\n\
@@ -57,6 +102,7 @@ def print_html():
 <head>\n\
 <title>SVG Mapping</title>\n\
 <link href="../styling.css" rel="stylesheet" type="text/css" >\n\
+<link href="../popups.css" rel="stylesheet" type="text/css" >\n\
 <style type="text/css" media="screen">\n
 ''')
 
@@ -88,10 +134,11 @@ def print_html():
 
     for row in range(len(XFields)):
         print('''#r'''+str(row)+''' {
-fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n''')
-           
+fill: #'''+str(colorramp[row+10])+''';}\n''')
 
-    print('''</style>\n</head>\n<body>''')
+
+    print('''</style>\n''')
+    print('''</head>\n<body>''')
 
     #remove .face later
 #    print('''Content-Type: text/html\n\n\
@@ -104,17 +151,17 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
 #</style>\n
 #</head>\n<body>''')
 
-   
-    '''Dynamic SVG Extent'''  
- 
+
+    '''Dynamic SVG Extent'''
+
     print('''<svg viewBox="-5 -4 110 110" >\n''')
-    
+
     maxX = max(XFields,key=lambda item:item[1])[1]
     maxY = max(YFields,key=lambda item:item[1])[1]
 
     i = 1
     j = 1
- 
+
     '''Grid Labelling'''
     '''Static Values for neat positioning'''
     '''Y Axis Inverted'''
@@ -131,12 +178,12 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
         j = j + 1
         if j == maxY + 1:
             print('''<text font-size="2" x="-3" y="'''+str(0)+'''" >'''+str(maxY)+'''</text>''')
-            break    
+            break
 
     '''Grid Computing'''
     i = 1
     j = 1
-    
+
     while True:
         xticks = str(float((i/maxX)*100))
         print('''<line x1='''+xticks+''' y1=0 x2='''+xticks+''' y2=100 class = "line" /> ''')
@@ -144,41 +191,64 @@ fill: #'''+str(colorramp[row+10])+''';\nstroke-width: 7;\nfill-opacity: 0.5;}\n'
         if i == maxX:
             break
     while True:
-        yticks = str(float((j/maxY*100)))                
-        print('''<line x1=0 y1='''+yticks+''' x2=100 y2='''+yticks+''' class = "line"/> ''')             
+        yticks = str(float((j/maxY*100)))
+        print('''<line x1=0 y1='''+yticks+''' x2=100 y2='''+yticks+''' class = "line"/> ''')
         j = j + 1
         if j == maxY:
             break
-                
-   
-    
+
+
+
     '''Rectangle Computing'''
-    
+
 
 #   Fill + transparency + hovering
 #   Labelling + hovering [Owner + Crop + Extent]
 #   OnClick [Popup of finds at coordinates]
-  
+
     for row in range(len(XFields)):
-        lowX = str((XFields[row][0]/maxX)*100)
-        highX = str((XFields[row][1]/maxX)*100)
-        
-        lowY = str((YFields[row][0]/maxY)*100)
-        highY = str((YFields[row][1]/maxY)*100)
-            
-        print ('''<polygon points="'''+lowX+''' '''+lowY+''', '''+highX+''' '''+lowY+''', \
-'''+highX+''' '''+highY+''', '''+lowX+''' '''+highY+'''" class="rectangle" id="r'''+str(row)+'''" />''')
-        
+
+        lowX = (XFields[row][0]/maxX)*100
+        highX = (XFields[row][1]/maxX)*100
+
+        lowY = (YFields[row][0]/maxY)*100
+        highY = (YFields[row][1]/maxY)*100
+
+        print ('''\n<polygon points="'''+str(lowX)+''' '''+str(lowY)+''', '''+str(highX)+''' '''+str(lowY)+''', \
+'''+str(highX)+''' '''+str(highY)+''', '''+str(lowX)+''' '''+str(highY)+'''" class="fields" id="r'''+str(row)+'''" \
+onclick="changeClassFromIDr'''+str(row)+'''()" />''')
+        i = 1
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY)+'''">\
+Field ID:'''+str(fields['FieldID'][row])+'''\n</text>''')
+        i = i + 1
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+5)+'''">\
+Owner:'''+str(fields['Owner'][row])+'''\n</text>''')
+        i = i + 1
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+10)+'''">\
+Area:'''+str(fields['Area'][row])+'''\n</text>''')
+        i = i + 1
+        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+15)+'''">\
+CropID:'''+str(fields['Crop'][row])+'''\n</text>''')
+
     for row in range(len(Points)):
         X = str((Points[row][0]/maxX)*100)
         Y = str((Points[row][1]/maxX)*100)
-        
+
         print ('''<circle cx="'''+X+'''" cy="'''+Y+'''" r="1" fill="blue" />''')
-       
 
-    print("</svg>\n</svg>\n")   
+
+    print("</svg>\n")
+
+
+    '''JavaScript'''
+
+    for row in range(len(XFields)):
+        print('''<script>\nfunction changeClassFromIDr'''+str(row)+'''() {\n''')
+        for i in range(len(fields)):
+            print('''document.getElementById('textr'''+str(row)+'''Nr'''+str(i+1)+'''').classList.toggle('visible');\n''')
+        print('''}\n</script>''')
+
     print("</body>\n</html>")
-
     print(temp.render())
 
 #run
