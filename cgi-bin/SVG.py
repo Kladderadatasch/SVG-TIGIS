@@ -8,38 +8,38 @@ import cgi
 cgitb.enable(format = 'text')
 from jinja2 import Environment, FileSystemLoader
 
-'''Retrieving coordinates from DB - Essential Data'''
-'''First DB connection function'''
-def coordinatesHtml(coord = "Fields",x = True, y = False):
-    conn = cx_Oracle.connect("student/train@geosgen")
-    c = conn.cursor()
-    if coord == "Fields":
-        if x == True and y == False:
-            c.execute("SELECT LOWX,HIX FROM GISTEACH.FIELDS")
-            list = []
-            for row in c:
-                list.append(row)
-            return list
-        elif x == False and y == True:
-            c.execute("SELECT LOWY,HIY FROM GISTEACH.FIELDS")
-            list = []
-            for row in c:
-                list.append(row)
-            return list
-        else:
-            print('''Please select either x or y to be True and the counterpart \
-    to be False. Both x = True, y = True or x = False, y = False are not valid.''')
-    elif coord == "Points":
-        c.execute("SELECT XCOORD,YCOORD FROM GISTEACH.FINDS")
-        list = []
-        for row in c:
-            list.append(row)
-        return list
-
-    else:
-        print('''"Please select coord = "Fields" or coord = "Points"''')
-
-    conn.close()
+#'''Retrieving coordinates from DB - Essential Data'''
+#'''First DB connection function'''
+#def coordinatesHtml(coord = "Fields",x = True, y = False):
+#    conn = cx_Oracle.connect("student/train@geosgen")
+#    c = conn.cursor()
+#    if coord == "Fields":
+#        if x == True and y == False:
+#            c.execute("SELECT LOWX,HIX FROM GISTEACH.FIELDS")
+#            list = []
+#            for row in c:
+#                list.append(row)
+#            return list
+#        elif x == False and y == True:
+#            c.execute("SELECT LOWY,HIY FROM GISTEACH.FIELDS")
+#            list = []
+#            for row in c:
+#                list.append(row)
+#            return list
+#        else:
+#            print('''Please select either x or y to be True and the counterpart \
+#    to be False. Both x = True, y = True or x = False, y = False are not valid.''')
+#    elif coord == "Points":
+#        c.execute("SELECT XCOORD,YCOORD FROM GISTEACH.FINDS")
+#        list = []
+#        for row in c:
+#            list.append(row)
+#        return list
+#
+#    else:
+#        print('''"Please select coord = "Fields" or coord = "Points"''')
+#
+#    conn.close()
 
 '''Retrieving ownership, crops, area, etc. data from DB - Secondary data'''
 '''Second DB connection function'''
@@ -53,7 +53,7 @@ def dataHtml(fields = True, finds = False):
 #        SELECT * FROM GISTEACH.CROPS;
 #        JOIN SELECTION IN DB
         list = []
-        dict = {'FieldID':[],'LowX':[],'LowY':[],'HiX':[],'HiY':[],'Area':[],'Owner':[],'Crop':[],'StartSeason':[],'EndSeason':[]}
+        dict = {'FieldID':[],'LowX':[],'LowY':[],'HiX':[],'HiY':[],'Area':[],'Owner':[],'Crop':[],'StartSeason':[],'EndSeason':[],'MaxCoord':[]}
         for row in c:
             list.append(row)
         for row in range(len(list)):
@@ -71,11 +71,18 @@ def dataHtml(fields = True, finds = False):
 #            Update - Relative and Y Inverted Coordinates
         maxX = max(dict['HiX'])
         maxY = max(dict['HiY'])
+        if maxX > maxY:
+            dict['MaxCoord'].append(maxX)
+            maximum = maxX
+        else:
+            dict['MaxCoord'].append(maxY)
+            maximum = maxY          
         for row in range(len(list)):
-            dict['LowX'][row]= ((dict['LowX'][row]/maxX))*100
-            dict['LowY'][row]= (1-(dict['LowY'][row]/maxY))*100
-            dict['HiX'][row]= ((dict['HiX'][row]/maxX))*100
-            dict['HiY'][row]= (1-(dict['HiY'][row]/maxY))*100
+            dict['LowX'][row]= ((dict['LowX'][row]/maximum))*100
+            dict['LowY'][row]= (1-(dict['LowY'][row]/maximum))*100
+            dict['HiX'][row]= ((dict['HiX'][row]/maximum))*100
+            dict['HiY'][row]= (1-(dict['HiY'][row]/maximum))*100
+
         return dict
     elif finds == True:
         c.execute("SELECT FIND_ID, XCOORD, YCOORD, NAME, PERIOD, USE, DEPTH, FIELD_NOTES FROM GISTEACH.FINDS, GISTEACH.CLASS WHERE GISTEACH.FINDS.TYPE = GISTEACH.CLASS.TYPE")
@@ -93,11 +100,23 @@ def dataHtml(fields = True, finds = False):
             dict['Depth'].append(list[row][6])
             dict['FieldNotes'].append(list[row][7])
 #            Update - Relative and Y Inverted Coordinates
-        maxX = max(dict['XCoord'])
-        maxY = max(dict['YCoord'])
+        c.execute("SELECT HIX, HIY FROM GISTEACH.FIELDS")
+        list = []
+        corddict = {'HiX':[],'HiY':[]}
+        for row in c:
+            list.append(row)
         for row in range(len(list)):
-            dict['XCoord'][row] = ((dict['XCoord'][row]/maxX))*100
-            dict['YCoord'][row] = (1-(dict['YCoord'][row]/maxY))*100
+            corddict['HiX'].append(list[row][0])
+            corddict['HiY'].append(list[row][1])
+        maxX = max(corddict['HiX'])
+        maxY = max(corddict['HiY'])
+        if maxX > maxY:
+            maximum = maxX
+        else:
+            maximum = maxY
+        for row in range(len(list)):
+            dict['XCoord'][row] = ((dict['XCoord'][row]/maximum))*100
+            dict['YCoord'][row] = (1-(dict['YCoord'][row]/maximum))*100
         return dict
 
     conn.close()
@@ -109,9 +128,9 @@ def dataHtml(fields = True, finds = False):
 def print_html():
     env = Environment(loader = FileSystemLoader('../'))
     temp = env.get_template('SVG.html')
-    XFields = coordinatesHtml(x = True, y = False)
-    YFields = coordinatesHtml(x = False, y = True)
-    Points = coordinatesHtml(coord = "Points")
+#    XFields = coordinatesHtml(x = True, y = False)
+#    YFields = coordinatesHtml(x = False, y = True)
+#    Points = coordinatesHtml(coord = "Points")
     fields = dataHtml(fields = True)
     finds = dataHtml(fields = False, finds = True)
 
@@ -157,7 +176,7 @@ def print_html():
                  "4682B4","D2B48C",8080,"D8BFD8","FF6347","40E0D0","EE82EE",
                  "F5DEB3","FFFFFF","F5F5F5","FFFF00","9ACD32"]
 
-    for row in range(len(XFields)):
+    for row in range(len(fields['FieldID'])):
         print('''#r'''+str(row)+''' {
 fill: #'''+str(colorramp[row+10])+''';}\n''')
 
@@ -181,8 +200,9 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 
     print('''<svg viewBox="-5 -4 110 110" >\n''')
 
-    maxX = max(XFields,key=lambda item:item[1])[1]
-    maxY = max(YFields,key=lambda item:item[1])[1]
+#    maxX = max(XFields,key=lambda item:item[1])[1]
+#    maxY = max(YFields,key=lambda item:item[1])[1]
+
 
     i = 1
     j = 1
@@ -191,18 +211,14 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
     '''Static Values for neat positioning'''
     '''Y Axis Inverted'''
     while True:
-        xticks = float((i/maxX)*100)
-        print('''<text font-size="2" x="'''+str(xticks -0.5)+'''" y="103">'''+str(i)+'''</text>''')
+        ticks = float((i/fields['MaxCoord'][0])*100)
+        print('''<text font-size="2" x="'''+str(ticks -0.5)+'''" y="103">'''+str(i)+'''</text>''')
+        print('''<text font-size="2" x="-3" y="'''+str(ticks +0.5)+'''" >'''+str(-1*(j-fields['MaxCoord'][0]))+'''</text>''')
         i = i + 1
-        if i == maxX + 1:
-            print('''<text font-size="2" x="'''+str(0)+'''" y="103">'''+str(0)+'''</text>''')
-            break
-    while True:
-        yticks = float((j/maxY)*100)
-        print('''<text font-size="2" x="-3" y="'''+str(yticks +0.5)+'''" >'''+str(-1*(j-maxY))+'''</text>''')
         j = j + 1
-        if j == maxY + 1:
-            print('''<text font-size="2" x="-3" y="'''+str(0)+'''" >'''+str(maxY)+'''</text>''')
+        if i == fields['MaxCoord'][0] + 1:
+            print('''<text font-size="2" x="'''+str(0)+'''" y="103">'''+str(0)+'''</text>''')
+            print('''<text font-size="2" x="-3" y="'''+str(0)+'''" >'''+str(fields['MaxCoord'][0])+'''</text>''')
             break
 
     '''Grid Computing'''
@@ -210,16 +226,11 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
     j = 1
 
     while True:
-        xticks = str(float((i/maxX)*100))
-        print('''<line x1='''+xticks+''' y1=0 x2='''+xticks+''' y2=100 class = "line" /> ''')
+        ticks = str(float((i/fields['MaxCoord'][0])*100))
+        print('''<line x1='''+ticks+''' y1=0 x2='''+ticks+''' y2=100 class = "line" /> ''')
+        print('''<line x1=0 y1='''+ticks+''' x2=100 y2='''+ticks+''' class = "line"/> ''')
         i = i + 1
-        if i == maxX:
-            break
-    while True:
-        yticks = str(float((j/maxY*100)))
-        print('''<line x1=0 y1='''+yticks+''' x2=100 y2='''+yticks+''' class = "line"/> ''')
-        j = j + 1
-        if j == maxY:
+        if i == fields['MaxCoord'][0]:
             break
 
 
@@ -232,12 +243,12 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 #   OnClick [Popup of finds at coordinates]
 
     for row in range(len(fields['FieldID'])):
-   
+
         lowX = fields['LowX'][row]
         lowY = fields['LowY'][row]
         highX = fields['HiX'][row]
         highY = fields['HiY'][row]
-        
+
         print ('''\n<polygon points="'''+str(lowX)+''' '''+str(lowY)+''', '''+str(highX)+''' '''+str(lowY)+''', \
 '''+str(highX)+''' '''+str(highY)+''', '''+str(lowX)+''' '''+str(highY)+'''" class="fields" id="r'''+str(row)+'''" \
 onclick="changeClassFromIDr'''+str(row)+'''()" />''')
@@ -263,7 +274,7 @@ CropID:'''+str(fields['Crop'][row])+'''\n</text>''')
         X = finds['XCoord'][row]
         Y = finds['YCoord'][row]
 
-        print ('''<circle cx="'''+str(X)+'''" cy="'''+str(Y)+'''" r="1" fill="blue" />''')
+        print ('''<circle class="finds" cx="'''+str(X)+'''" cy="'''+str(Y)+'''" r="1.5" />''')
 
     '''InfoIcon Computing'''
     print('''<g id="myicon" pointer-events="all" transform="translate(0,0)">\n\
@@ -285,9 +296,9 @@ CropID:'''+str(fields['Crop'][row])+'''\n</text>''')
 
     '''JavaScript'''
 
-    for row in range(len(XFields)):
+    for row in range(len(fields['FieldID'])):
         print('''<script>\nfunction changeClassFromIDr'''+str(row)+'''() {\n''')
-        for i in range(len(fields)):
+        for i in range(len(fields['FieldID'])):
             print('''document.getElementById('textr'''+str(row)+'''Nr'''+str(i+1)+'''').classList.toggle('visible');\n''')
         print('''}\n</script>''')
 
