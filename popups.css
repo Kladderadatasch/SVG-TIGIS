@@ -1,32 +1,21 @@
-/* The actual popup */
-.hidden {
-  visibility: hidden;
-
+.findtext {
+  width: 400px;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  font-size: 10pt;
+  background-color: white;
+  border-radius: 6px;
+  position: absolute;
+  display: none;
 }
 
-.visible {
-  visibility: visible;
-
+.findtext::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+  background-color: white;
+  position: absolute;
+  left: -6px;
+  top: 68px;
 }
-
-/*
-width: 400px;
-padding: 20px;
-text-align: center;
-font-family: Arial, sans-serif;
-font-size: 10pt;
-background-color: white;
-border-radius: 6px;
-position: absolute;
-*/
-
-/*
-content: "";
-width: 12px;
-height: 12px;
-transform: rotate(45deg);
-background-color: white;
-position: absolute;
-left: -6px;
-top: 68px;
-*/
