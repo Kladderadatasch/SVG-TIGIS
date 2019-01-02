@@ -8,38 +8,6 @@ import cgi
 cgitb.enable(format = 'text')
 from jinja2 import Environment, FileSystemLoader
 
-#'''Retrieving coordinates from DB - Essential Data'''
-#'''First DB connection function'''
-#def coordinatesHtml(coord = "Fields",x = True, y = False):
-#    conn = cx_Oracle.connect("student/train@geosgen")
-#    c = conn.cursor()
-#    if coord == "Fields":
-#        if x == True and y == False:
-#            c.execute("SELECT LOWX,HIX FROM GISTEACH.FIELDS")
-#            list = []
-#            for row in c:
-#                list.append(row)
-#            return list
-#        elif x == False and y == True:
-#            c.execute("SELECT LOWY,HIY FROM GISTEACH.FIELDS")
-#            list = []
-#            for row in c:
-#                list.append(row)
-#            return list
-#        else:
-#            print('''Please select either x or y to be True and the counterpart \
-#    to be False. Both x = True, y = True or x = False, y = False are not valid.''')
-#    elif coord == "Points":
-#        c.execute("SELECT XCOORD,YCOORD FROM GISTEACH.FINDS")
-#        list = []
-#        for row in c:
-#            list.append(row)
-#        return list
-#
-#    else:
-#        print('''"Please select coord = "Fields" or coord = "Points"''')
-#
-#    conn.close()
 
 '''Retrieving ownership, crops, area, etc. data from DB - Secondary data'''
 '''Second DB connection function'''
@@ -50,8 +18,6 @@ def dataHtml(fields = True, finds = False):
     c = conn.cursor()
     if fields == True:
         c.execute("SELECT FIELD_ID,LOWX,LOWY,HIX,HIY,AREA,OWNER,NAME,START_OF_SEASON, END_OF_SEASON FROM GISTEACH.FIELDS, GISTEACH.CROPS WHERE GISTEACH.FIELDS.CROP = GISTEACH.CROPS.CROP")
-#        SELECT * FROM GISTEACH.CROPS;
-#        JOIN SELECTION IN DB
         list = []
         dict = {'FieldID':[],'LowX':[],'LowY':[],'HiX':[],'HiY':[],'Area':[],'Owner':[],'Crop':[],'StartSeason':[],'EndSeason':[],'MaxCoord':[]}
         for row in c:
@@ -76,7 +42,7 @@ def dataHtml(fields = True, finds = False):
             maximum = maxX
         else:
             dict['MaxCoord'].append(maxY)
-            maximum = maxY          
+            maximum = maxY
         for row in range(len(list)):
             dict['LowX'][row]= ((dict['LowX'][row]/maximum))*100
             dict['LowY'][row]= (1-(dict['LowY'][row]/maximum))*100
@@ -128,9 +94,6 @@ def dataHtml(fields = True, finds = False):
 def print_html():
     env = Environment(loader = FileSystemLoader('../'))
     temp = env.get_template('SVG.html')
-#    XFields = coordinatesHtml(x = True, y = False)
-#    YFields = coordinatesHtml(x = False, y = True)
-#    Points = coordinatesHtml(coord = "Points")
     fields = dataHtml(fields = True)
     finds = dataHtml(fields = False, finds = True)
 
@@ -184,32 +147,18 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
     print('''</style>\n''')
     print('''</head>\n<body>''')
 
-    #remove .face later
-#    print('''Content-Type: text/html\n\n\
-#<!DOCTYPE html>\n\
-#<head>\n\
-#<title>SVG Mapping</title>\n\
-#<style type="text/css" media="screen">\n
-#html, body { margin:0; padding:0; overflow:hidden }\n
-#svg { position:fixed; top:0; bottom:0; left:0; right:0 }\n
-#</style>\n
-#</head>\n<body>''')
-
-
     '''Dynamic SVG Extent'''
 
     print('''<svg viewBox="-5 -4 110 110" >\n''')
 
-#    maxX = max(XFields,key=lambda item:item[1])[1]
-#    maxY = max(YFields,key=lambda item:item[1])[1]
-
-
-    i = 1
-    j = 1
 
     '''Grid Labelling'''
     '''Static Values for neat positioning'''
     '''Y Axis Inverted'''
+
+    i = 1
+    j = 1
+
     while True:
         ticks = float((i/fields['MaxCoord'][0])*100)
         print('''<text font-size="2" x="'''+str(ticks -0.5)+'''" y="103">'''+str(i)+'''</text>''')
@@ -237,11 +186,6 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 
     '''Rectangle Computing'''
 
-
-#   Fill + transparency + hovering
-#   Labelling + hovering [Owner + Crop + Extent]
-#   OnClick [Popup of finds at coordinates]
-
     for row in range(len(fields['FieldID'])):
 
         lowX = fields['LowX'][row]
@@ -254,71 +198,49 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 onclick="changeClassFromIDr'''+str(row)+'''()" />''')
 
 
-
-#    '''Text Computing'''
-        i = 1
-        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+5)+'''">\
-Field ID:'''+str(fields['FieldID'][row])+'''\n</text>''')
-        i = i + 1
-        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+10)+'''">\
-Owner:'''+str(fields['Owner'][row])+'''\n</text>''')
-        i = i + 1
-        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+15)+'''">\
-Area:'''+str(fields['Area'][row])+'''\n</text>''')
-        i = i + 1
-        print('''<text class="hidden" id="textr'''+str(row)+'''Nr'''+str(i)+'''" x="'''+str(lowX)+'''" y="'''+str(lowY+20)+'''">\
-CropID:'''+str(fields['Crop'][row])+'''\n</text>''')
-
     '''Findings Computing'''
     for row in range(len(finds['FindID'])):
         X = finds['XCoord'][row]
         Y = finds['YCoord'][row]
 
-        print ('''<circle class="finds" cx="'''+str(X)+'''" cy="'''+str(Y)+'''" r="1.5" />''')
+        print ('''<circle id="findicon'''+str(finds['FindID'][row])+'''" class="finds" cx="'''+str(X)+'''" cy="'''+str(Y)+'''" r="1.5" />''')
 
-    '''InfoIcon Computing'''
-    print('''<g id="myicon" pointer-events="all" transform="translate(0,0)">\n\
-    <circle cx="22" cy="9" r="3.5" fill="none" stroke="gold" stroke-width="0.5"/>\n\
-    <circle cx="22" cy="7.7" r="0.5" fill="gold"/>\n\
-    <rect x="21.625" y="8.8" width="0.75" height="2.5" fill="gold"/>\n\
-  </g>''')
-    print("</svg>\n")
+#    '''InfoIcon Computing'''
+#    print('''<g id="myicon" pointer-events="all" transform="translate(0,0)">\n\
+#    <circle cx="22" cy="9" r="3.5" fill="none" stroke="gold" stroke-width="0.5"/>\n\
+#    <circle cx="22" cy="7.7" r="0.5" fill="gold"/>\n\
+#    <rect x="21.625" y="8.8" width="0.75" height="2.5" fill="gold"/>\n\
+#  </g>''')
+#    print("</svg>\n")
+#
 
-    '''PopUp Text'''
-    print('''<div id="mypopup">\n\
-<h3>Popup title</h3>\n\
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,\
- sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\
- Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>\n\
-<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\
- Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>\n\
-</div>\n''')
+    '''Finds Text'''
+    for row in range(len(finds['FindID'])):
+        print('''<div id="findtext'''+str(finds['FindID'][row])+'''" class="findtext">\n\
+<h3>Artefact: '''+str(finds['Name'][row])+'''</h3>\n\
+<p>ID: '''+str(finds['FindID'][row])+'''</p>\n\
+<p>Depth: '''+str(finds['Depth'][row])+'''</p>\n\
+<p>Period: '''+str(finds['Period'][row])+'''</p>\n\
+<p>Use: '''+str(finds['Use'][row])+'''</p>\n\
+<p>Field Notes: '''+str(finds['FieldNotes'][row])+'''</p></div>''')
 
-    '''JavaScript'''
 
-    for row in range(len(fields['FieldID'])):
-        print('''<script>\nfunction changeClassFromIDr'''+str(row)+'''() {\n''')
-        for i in range(len(fields['FieldID'])):
-            print('''document.getElementById('textr'''+str(row)+'''Nr'''+str(i+1)+'''').classList.toggle('visible');\n''')
-        print('''}\n</script>''')
-
-    '''PopUp Script'''
-
-    print('''<script>\nvar myicon = document.getElementById("myicon");\n\
-var mypopup = document.getElementById("mypopup");\n\
-myicon.addEventListener("mouseover", showPopup);\n\
-myicon.addEventListener("mouseout", hidePopup);\n\
+    '''PopUp Finds Script'''
+    for row in range(len(finds['FindID'])):
+        print('''<script>\nvar myicon'''+str(row)+''' = document.getElementById("findicon'''+str(finds['FindID'][row])+'''");\n\
+var mypopup'''+str(row)+''' = document.getElementById("findtext'''+str(finds['FindID'][row])+'''");\n\
+myicon'''+str(row)+'''.addEventListener("mouseover", showPopup'''+str(finds['FindID'][row])+''');\n\
+myicon'''+str(row)+'''.addEventListener("mouseout", hidePopup'''+str(finds['FindID'][row])+''');\n\
 \n\
-function showPopup(evt) {\n\
-var iconPos = myicon.getBoundingClientRect();\n\
-mypopup.style.left = (iconPos.right + 20) + "px";\n\
-mypopup.style.top = (window.scrollY + iconPos.top - 60) + "px";\n\
-mypopup.style.display = "block";\n\
+function showPopup'''+str(finds['FindID'][row])+'''(evt) {\n\
+var iconPos = myicon'''+str(row)+'''.getBoundingClientRect();\n\
+mypopup'''+str(row)+'''.style.left = (iconPos.right + 20) + "px";\n\
+mypopup'''+str(row)+'''.style.top = (window.scrollY + iconPos.top - 60) + "px";\n\
+mypopup'''+str(row)+'''.style.display = "block";\n\
 }\n\
-function hidePopup(evt) {\n\
-  mypopup.style.display = "none";\n\
+function hidePopup'''+str(finds['FindID'][row])+'''(evt) {\n\
+  mypopup'''+str(row)+'''.style.display = "none";\n\
 }\n</script>''')
-
     print("</body>\n</html>")
     print(temp.render())
 
