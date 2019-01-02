@@ -1,18 +1,21 @@
-body { background:#eee;
+body {
+height: 100%;
+max-height: 100%;
+background:#eee;
 margin:0 }
 
 svg {
-display:block; 
-border:1px 
+display:block;
+border:1px
 solid #ccc;
 position:relative;
 top:5%;
-left:5%; 
-width:90%; 
-height:90%; 
+left:5%;
+width:90%;
+height:90%;
 background:#fff;}
 
-.line {stroke:rgb(0,0,0); 
+.line {stroke:rgb(0,0,0);
 stroke-width: 0.2px;}
 
 .text {font-size:12;
@@ -25,4 +28,14 @@ opacity: 0.5;
 
 .fields:hover {
     opacity: 0.95;
+    cursor: pointer;
+}
+
+.finds {
+  fill: gold;
+  opacity: 0.8;
+}
+
+.finds:hover {
+  opacity: 1;
 }
