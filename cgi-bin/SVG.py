@@ -194,8 +194,7 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
         highY = fields['HiY'][row]
 
         print ('''\n<polygon points="'''+str(lowX)+''' '''+str(lowY)+''', '''+str(highX)+''' '''+str(lowY)+''', \
-'''+str(highX)+''' '''+str(highY)+''', '''+str(lowX)+''' '''+str(highY)+'''" class="fields" id="r'''+str(row)+'''" \
-onclick="changeClassFromIDr'''+str(row)+'''()" />''')
+'''+str(highX)+''' '''+str(highY)+''', '''+str(lowX)+''' '''+str(highY)+'''" class="fields" id="r'''+str(row)+'''" />''')
 
 
     '''Findings Computing'''
@@ -213,6 +212,17 @@ onclick="changeClassFromIDr'''+str(row)+'''()" />''')
 #  </g>''')
 #    print("</svg>\n")
 #
+    '''Fields Text'''
+    for row in range(len(fields['FieldID'])):
+        print('''<div id="fieldtext'''+str(row)+'''" class="fieldtext">\n\
+<h3>Field</h3>\n\
+<p>ID: '''+str(fields['FieldID'][row])+'''</p>\n\
+<p>Owner: '''+str(fields['Owner'][row])+'''</p>\n\
+<p>Crop: '''+str(fields['Crop'][row])+'''</p>\n\
+<p>Start Season: '''+str(fields['StartSeason'][row])+'''</p>\n\
+<p>End Season: '''+str(fields['EndSeason'][row])+'''</p>\n\
+<p>Field Size: '''+str(fields['Area'][row])+'''</p></div>''')
+
 
     '''Finds Text'''
     for row in range(len(finds['FindID'])):
@@ -224,6 +234,22 @@ onclick="changeClassFromIDr'''+str(row)+'''()" />''')
 <p>Use: '''+str(finds['Use'][row])+'''</p>\n\
 <p>Field Notes: '''+str(finds['FieldNotes'][row])+'''</p></div>''')
 
+    '''PopUp Fields Script'''
+    for row in range(len(fields['FieldID'])):
+        print('''<script>\nvar myfield'''+str(row)+''' = document.getElementById("r'''+str(row)+'''");\n\
+var myfieldpopup'''+str(row)+''' = document.getElementById("fieldtext'''+str(row)+'''");\n\
+myfield'''+str(row)+'''.addEventListener("mouseover", showFieldPopup'''+str(row)+''');\n\
+myfield'''+str(row)+'''.addEventListener("mouseout", hideFieldPopup'''+str(row)+''');\n\
+\n\
+function showFieldPopup'''+str(row)+'''(evt) {\n\
+var FieldPos = myfield'''+str(row)+'''.getBoundingClientRect();\n\
+myfieldpopup'''+str(row)+'''.style.left = (FieldPos.right + 20) + "px";\n\
+myfieldpopup'''+str(row)+'''.style.top = (window.scrollY + FieldPos.top - 60) + "px";\n\
+myfieldpopup'''+str(row)+'''.style.display = "block";\n\
+}\n\
+function hideFieldPopup'''+str(row)+'''(evt) {\n\
+  myfieldpopup'''+str(row)+'''.style.display = "none";\n\
+}\n</script>''')
 
     '''PopUp Finds Script'''
     for row in range(len(finds['FindID'])):
