@@ -149,7 +149,8 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 
     '''Dynamic SVG Extent'''
 
-    print('''<svg viewBox="-5 -4 110 110" >\n''')
+    print('''<svg viewBox="-5 -4 110 110" >\n\
+    <g class="grid>"''')
 
 
     '''Grid Labelling'''
@@ -182,10 +183,12 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
         if i == fields['MaxCoord'][0]:
             break
 
+    print('''</g>''')
 
 
     '''Rectangle Computing'''
 
+    print('''<g class="rectangles">''')
     for row in range(len(fields['FieldID'])):
 
         lowX = fields['LowX'][row]
@@ -197,22 +200,35 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 '''+str(highX)+''' '''+str(highY)+''', '''+str(lowX)+''' '''+str(highY)+'''" class="fields" id="r'''+str(row)+'''" />''')
 
 
+    print('''</g>''')
     '''Findings Computing'''
+    print('''<g class="findings">''')
     for row in range(len(finds['FindID'])):
         X = finds['XCoord'][row]
         Y = finds['YCoord'][row]
 
         print ('''<circle id="findicon'''+str(finds['FindID'][row])+'''" class="finds" cx="'''+str(X)+'''" cy="'''+str(Y)+'''" r="1.5" />''')
 
-#    '''InfoIcon Computing'''
-#    print('''<g id="myicon" pointer-events="all" transform="translate(0,0)">\n\
-#    <circle cx="22" cy="9" r="3.5" fill="none" stroke="gold" stroke-width="0.5"/>\n\
-#    <circle cx="22" cy="7.7" r="0.5" fill="gold"/>\n\
-#    <rect x="21.625" y="8.8" width="0.75" height="2.5" fill="gold"/>\n\
-#  </g>''')
-#    print("</svg>\n")
-#
+    print('''</g>''')
+
+    print('''<g class="legend" transform="translate(21,71)">\
+
+    <rect id="svg_1" height="19" width="19" y="10" x="60"/>\
+
+    <rect id="svg_2" height="4.6" width="4.6" y="15" x="62"/>\
+
+    <ellipse ry="1.5" rx="1.5" id="svg_3" cy="25" cx="64"/>\
+
+    <text class="legendtext" id="svg_6" y="18" x="70">Fields</text>\
+
+    <text class="legendtext" id="svg_9" y="25.5" x="70">Finds</text>\
+
+    </g>''')
+
+    print("</svg>\n")
+
     '''Fields Text'''
+    print('''<g class="text">''')
     for row in range(len(fields['FieldID'])):
         print('''<div id="fieldtext'''+str(row)+'''" class="fieldtext">\n\
 <h3>Field</h3>\n\
@@ -234,7 +250,10 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 <p>Use: '''+str(finds['Use'][row])+'''</p>\n\
 <p>Field Notes: '''+str(finds['FieldNotes'][row])+'''</p></div>''')
 
+    print('''</g>''')
+
     '''PopUp Fields Script'''
+    print('''<g class="inlineJS">''')
     for row in range(len(fields['FieldID'])):
         print('''<script>\nvar myfield'''+str(row)+''' = document.getElementById("r'''+str(row)+'''");\n\
 var myfieldpopup'''+str(row)+''' = document.getElementById("fieldtext'''+str(row)+'''");\n\
@@ -267,7 +286,8 @@ mypopup'''+str(row)+'''.style.display = "block";\n\
 function hidePopup'''+str(finds['FindID'][row])+'''(evt) {\n\
   mypopup'''+str(row)+'''.style.display = "none";\n\
 }\n</script>''')
-    print("</body>\n</html>")
+
+    print("</g>\n</body>\n</html>")
     print(temp.render())
 
 #run
