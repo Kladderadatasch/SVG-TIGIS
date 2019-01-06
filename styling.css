@@ -38,4 +38,37 @@ opacity: 0.5;
 
 .finds:hover {
   opacity: 1;
+  cursor: pointer;
+}
+
+.legendtext {
+  font-family: Josefin Sans, sans-serif;
+  font-size: 2px;
+  stroke-opacity: 0.6;
+  stroke-width: 0;
+  stroke: #000;
+  fill: #000000;
+  fill-opacity: 0.7;
+}
+#svg_1 {
+  fill: #A9A9A9;
+  fill-opacity: 0.95;
+  stroke: black;
+  stroke-width: 0.2;
+  stroke-opacity: 0.4;
+}
+
+#svg_2 {
+  fill: white;
+  stroke: black;
+  stroke-width: 0.2;
+  stroke-opacity: 0.4;
+
+}
+
+#svg_3 {
+  fill: gold;
+  stroke: black;
+  stroke-width: 0.2;
+  stroke-opacity: 0.4;
 }
