@@ -3,14 +3,18 @@ import cx_Oracle
 import cgitb
 import folium
 import cgi
+import re
 
 
 cgitb.enable(format = 'text')
 from jinja2 import Environment, FileSystemLoader
 
+'''Modifying text from DB'''
+def replacement(match):
+    return match.group().lower()
+
 
 '''Retrieving ownership, crops, area, etc. data from DB - Secondary data'''
-'''Second DB connection function'''
 '''Joining of data made inside DB'''
 
 def dataHtml(fields = True, finds = False):
@@ -20,10 +24,12 @@ def dataHtml(fields = True, finds = False):
         c.execute("SELECT FIELD_ID,LOWX,LOWY,HIX,HIY,AREA,OWNER,NAME,START_OF_SEASON, END_OF_SEASON FROM GISTEACH.FIELDS, GISTEACH.CROPS WHERE GISTEACH.FIELDS.CROP = GISTEACH.CROPS.CROP")
         list = []
         dict = {'FieldID':[],'LowX':[],'LowY':[],'HiX':[],'HiY':[],'Area':[],'Owner':[],'Crop':[],'StartSeason':[],'EndSeason':[],'MaxCoord':[]}
+        replace = ['Owner','Crop']
         for row in c:
             list.append(row)
-        for row in range(len(list)):
-#            Append
+            
+#       Append
+        for row in range(len(list)):              
             dict['FieldID'].append(list[row][0])
             dict['LowX'].append(list[row][1])
             dict['LowY'].append(list[row][2])
@@ -34,6 +40,12 @@ def dataHtml(fields = True, finds = False):
             dict['Crop'].append(list[row][7])
             dict['StartSeason'].append(list[row][8])
             dict['EndSeason'].append(list[row][9])
+            
+#        Modify Text recieved from DB    
+        for i in range(len(dict['FieldID'])):    
+            for j in range(len(replace)):
+                dict[replace[j]][i] = re.sub(r"[A-Z]",replacement,dict[replace[j]][i]).title()
+            
 #            Update - Relative and Y Inverted Coordinates
         maxX = max(dict['HiX'])
         maxY = max(dict['HiY'])
@@ -54,6 +66,7 @@ def dataHtml(fields = True, finds = False):
         c.execute("SELECT FIND_ID, XCOORD, YCOORD, NAME, PERIOD, USE, DEPTH, FIELD_NOTES FROM GISTEACH.FINDS, GISTEACH.CLASS WHERE GISTEACH.FINDS.TYPE = GISTEACH.CLASS.TYPE")
         list = []
         dict = {'FindID':[],'XCoord':[],'YCoord':[],'Name':[],'Period':[],'Use':[],'Depth':[],'FieldNotes':[]}
+        replace = ['Name','Period','Use','FieldNotes']
         for row in c:
             list.append(row)
         for row in range(len(list)):
@@ -65,6 +78,12 @@ def dataHtml(fields = True, finds = False):
             dict['Use'].append(list[row][5])
             dict['Depth'].append(list[row][6])
             dict['FieldNotes'].append(list[row][7])
+            
+#        Modify Text recieved from DB    
+        for i in range(len(dict['FindID'])):    
+            for j in range(len(replace)):
+                dict[replace[j]][i] = re.sub(r"[A-Z]",replacement,dict[replace[j]][i]).title()
+ 
 #            Update - Relative and Y Inverted Coordinates
         c.execute("SELECT HIX, HIY FROM GISTEACH.FIELDS")
         list = []
@@ -88,16 +107,14 @@ def dataHtml(fields = True, finds = False):
     conn.close()
 
 
-'''Template Creation'''
-'''Setting Environment'''
+    '''Template Creation'''
+    '''Setting Environment'''
 
 def print_html():
     env = Environment(loader = FileSystemLoader('../'))
     temp = env.get_template('SVG.html')
     fields = dataHtml(fields = True)
     finds = dataHtml(fields = False, finds = True)
-
-
 
     '''Creating Header'''
     '''../ seems to be necessary, even .html and .css are in same folder'''
@@ -196,12 +213,24 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
         highX = fields['HiX'][row]
         highY = fields['HiY'][row]
 
+        idX = (highX-((highX-lowX)/2))-2.5
+        idY = (highY-((highY-lowY)/2))-2.5
+        idW = 5
+        idH = 5
+        idTX = idX +1.8
+        idTY = idY +3.5
+
+        print('''<rect x="'''+str(idX)+'''" y="'''+str(idY)+'''" width="'''+str(idW)+'''" height="'''+str(idH)+'''" class="field_ids" />''')
+        print('''<text x="'''+str(idTX)+'''" y="'''+str(idTY)+'''" class="field_id_text">'''+str(fields['FieldID'][row])+'''</text>''' )
+
         print ('''\n<polygon points="'''+str(lowX)+''' '''+str(lowY)+''', '''+str(highX)+''' '''+str(lowY)+''', \
 '''+str(highX)+''' '''+str(highY)+''', '''+str(lowX)+''' '''+str(highY)+'''" class="fields" id="r'''+str(row)+'''" />''')
 
-
     print('''</g>''')
+
+
     '''Findings Computing'''
+
     print('''<g class="findings">''')
     for row in range(len(finds['FindID'])):
         X = finds['XCoord'][row]
@@ -213,14 +242,10 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 
     print('''<g class="legend" transform="translate(21,71)">\
 
-    <rect id="svg_1" height="19" width="19" y="10" x="60"/>\
-
-    <rect id="svg_2" height="4.6" width="4.6" y="15" x="62"/>\
-
-    <ellipse ry="1.5" rx="1.5" id="svg_3" cy="25" cx="64"/>\
-
+    <rect id="outerrect" height="19" width="19" y="10" x="60"/>\
+    <rect id="innerrect" height="4.6" width="4.6" y="15" x="62"/>\
+    <ellipse ry="1.5" rx="1.5" id="circle" cy="25" cx="64"/>\
     <text class="legendtext" id="svg_6" y="18" x="70">Fields</text>\
-
     <text class="legendtext" id="svg_9" y="25.5" x="70">Finds</text>\
 
     </g>''')
