@@ -12,7 +12,7 @@ position:relative;
 top:5%;
 left:5%;
 width:90%;
-height:90%;
+height:100%;
 background:#fff;}
 
 .line {stroke:rgb(0,0,0);
@@ -68,6 +68,30 @@ opacity: 0.45;
   stroke: #000;
   fill: #000000;
   fill-opacity: 0.9;
+}
+
+
+.desctext {
+  text-align: center;
+	font-family: 'Playfair Display', serif;
+	font-weight: 400;
+	text-transform: uppercase;
+	color: #3A4945;
+	padding: 0 0 0.125em;
+  opacity: 0.6;
+}
+
+.header {
+  font-size: 1.5em;
+}
+
+.content {
+  font-size: 1em;
+}
+
+.desctext:hover{
+  opacity: 1;
+
 }
 
 #outerrect {
