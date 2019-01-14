@@ -27,9 +27,9 @@ def dataHtml(fields = True, finds = False):
         replace = ['Owner','Crop']
         for row in c:
             list.append(row)
-            
+
 #       Append
-        for row in range(len(list)):              
+        for row in range(len(list)):
             dict['FieldID'].append(list[row][0])
             dict['LowX'].append(list[row][1])
             dict['LowY'].append(list[row][2])
@@ -40,12 +40,12 @@ def dataHtml(fields = True, finds = False):
             dict['Crop'].append(list[row][7])
             dict['StartSeason'].append(list[row][8])
             dict['EndSeason'].append(list[row][9])
-            
-#        Modify Text recieved from DB    
-        for i in range(len(dict['FieldID'])):    
+
+#        Modify Text recieved from DB
+        for i in range(len(dict['FieldID'])):
             for j in range(len(replace)):
                 dict[replace[j]][i] = re.sub(r"[A-Z]",replacement,dict[replace[j]][i]).title()
-            
+
 #            Update - Relative and Y Inverted Coordinates
         maxX = max(dict['HiX'])
         maxY = max(dict['HiY'])
@@ -78,12 +78,12 @@ def dataHtml(fields = True, finds = False):
             dict['Use'].append(list[row][5])
             dict['Depth'].append(list[row][6])
             dict['FieldNotes'].append(list[row][7])
-            
-#        Modify Text recieved from DB    
-        for i in range(len(dict['FindID'])):    
+
+#        Modify Text recieved from DB
+        for i in range(len(dict['FindID'])):
             for j in range(len(replace)):
                 dict[replace[j]][i] = re.sub(r"[A-Z]",replacement,dict[replace[j]][i]).title()
- 
+
 #            Update - Relative and Y Inverted Coordinates
         c.execute("SELECT HIX, HIY FROM GISTEACH.FIELDS")
         list = []
@@ -164,8 +164,14 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
     print('''</style>\n''')
     print('''</head>\n<body>''')
 
-    '''Dynamic SVG Extent'''
+    '''Describing Text'''
+    print('''<div class ="desctext">\n\
+<div class ="desctext header">\n\
+<p> Web Map of \n Archaeological Finds </p></div>\n\
+<div class ="desctext content">To interact with the map hover with your cursor of the fields or finds\n\
+</div></div>''')
 
+    '''Dynamic SVG Extent'''
     print('''<svg viewBox="-5 -4 110 110" >\n\
     <g class="grid>"''')
 
@@ -276,6 +282,8 @@ fill: #'''+str(colorramp[row+10])+''';}\n''')
 <p>Field Notes: '''+str(finds['FieldNotes'][row])+'''</p></div>''')
 
     print('''</g>''')
+
+
 
     '''PopUp Fields Script'''
     print('''<g class="inlineJS">''')
